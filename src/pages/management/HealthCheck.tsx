@@ -2,6 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * AIMANA JOURNEY - Health Check Page
  * Monitoramento de saúde das iniciativas de IA
+ * Layout full-width com IA contextual via botões e modais
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
@@ -15,8 +16,6 @@ import {
   CardContent,
   Badge,
   Button,
-  Input,
-  Progress,
 } from '@/components/ui';
 import {
   Activity,
@@ -27,7 +26,6 @@ import {
   TrendingUp,
   TrendingDown,
   Bot,
-  Send,
   RefreshCw,
   Server,
   Database,
@@ -35,8 +33,18 @@ import {
   Shield,
   Eye,
   BarChart3,
+  Play,
+  Pause,
+  RotateCcw,
+  FileText,
+  Filter,
+  Search,
+  Cpu,
+  HardDrive,
+  Wifi,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AIInsightBanner, AIActionButton, AIModal } from '@/components/ai';
 
 // Health metrics
 const healthMetrics = [
@@ -48,8 +56,14 @@ const healthMetrics = [
     latency: 1.1,
     errorRate: 0.2,
     throughput: 52,
+    requests24h: 1248,
+    avgResponseTime: 1.1,
     lastIncident: null,
     alerts: [],
+    version: '2.1.0',
+    model: 'GPT-4',
+    memory: 68,
+    cpu: 45,
   },
   {
     id: 2,
@@ -59,8 +73,14 @@ const healthMetrics = [
     latency: 2.8,
     errorRate: 0.8,
     throughput: 28,
+    requests24h: 672,
+    avgResponseTime: 2.8,
     lastIncident: '2025-02-03',
     alerts: ['Latência acima do SLA'],
+    version: '1.8.3',
+    model: 'Claude 3',
+    memory: 72,
+    cpu: 58,
   },
   {
     id: 3,
@@ -70,8 +90,14 @@ const healthMetrics = [
     latency: 5.2,
     errorRate: 3.5,
     throughput: 5,
+    requests24h: 120,
+    avgResponseTime: 5.2,
     lastIncident: '2025-02-04',
     alerts: ['Taxa de erro crítica', 'Throughput baixo'],
+    version: '1.5.2',
+    model: 'GPT-4',
+    memory: 92,
+    cpu: 88,
   },
   {
     id: 4,
@@ -81,17 +107,41 @@ const healthMetrics = [
     latency: 1.5,
     errorRate: 0.1,
     throughput: 45,
+    requests24h: 1080,
+    avgResponseTime: 1.5,
     lastIncident: null,
     alerts: [],
+    version: '3.0.1',
+    model: 'Claude 3.5',
+    memory: 55,
+    cpu: 38,
+  },
+  {
+    id: 5,
+    name: 'Report Generator',
+    status: 'healthy',
+    uptime: 99.7,
+    latency: 2.1,
+    errorRate: 0.3,
+    throughput: 18,
+    requests24h: 432,
+    avgResponseTime: 2.1,
+    lastIncident: null,
+    alerts: [],
+    version: '2.0.0',
+    model: 'GPT-4',
+    memory: 61,
+    cpu: 42,
   },
 ];
 
 // System health
 const systemHealth = [
-  { name: 'API Gateway', status: 'healthy', uptime: 99.99 },
-  { name: 'Vector Database', status: 'healthy', uptime: 99.95 },
-  { name: 'LLM Providers', status: 'warning', uptime: 99.5 },
-  { name: 'Trust Layer', status: 'healthy', uptime: 100 },
+  { name: 'API Gateway', status: 'healthy', uptime: 99.99, icon: Wifi },
+  { name: 'Vector Database', status: 'healthy', uptime: 99.95, icon: Database },
+  { name: 'LLM Providers', status: 'warning', uptime: 99.5, icon: Cpu },
+  { name: 'Trust Layer', status: 'healthy', uptime: 100, icon: Shield },
+  { name: 'Storage', status: 'healthy', uptime: 99.98, icon: HardDrive },
 ];
 
 // Incidents
@@ -123,6 +173,15 @@ const recentIncidents = [
     status: 'resolved',
     severity: 'low',
   },
+  {
+    id: 4,
+    agent: 'Data Insights Agent',
+    type: 'maintenance',
+    description: 'Atualização de modelo concluída',
+    timestamp: '2025-01-30 02:00',
+    status: 'resolved',
+    severity: 'low',
+  },
 ];
 
 const statusConfig = {
@@ -131,45 +190,52 @@ const statusConfig = {
   critical: { label: 'Crítico', color: 'text-status-error', bg: 'bg-status-error', icon: XCircle },
 };
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+// AI Insights
+const aiInsights = [
+  {
+    id: '1',
+    type: 'warning' as const,
+    title: 'Agente Crítico Detectado',
+    description: 'Document Analyzer com taxa de erro de 3.5% - requer atenção imediata. Padrão: 80% dos erros com PDFs > 50 páginas.',
+    action: {
+      label: 'Diagnosticar',
+      onClick: () => {},
+    },
+  },
+  {
+    id: '2',
+    type: 'info' as const,
+    title: 'Otimização Disponível',
+    description: 'Sales Assistant pode reduzir latência em 40% com ajuste de cache.',
+  },
+];
 
 export function HealthCheck() {
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      role: 'assistant',
-      content: `Olá! Sou o **HealthAgent**. Status atual do sistema:
-
-**Resumo:**
-✅ 2 agentes saudáveis
-⚠️ 1 agente com atenção
-❌ 1 agente crítico
-
-**Alerta Crítico:**
-🔴 Document Analyzer com taxa de erro de 3.5%
-
-**Recomendação imediata:**
-Pausar o Document Analyzer e investigar causa raiz.
-
-Posso gerar um relatório detalhado?`,
-    },
-  ]);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'healthy' | 'warning' | 'critical'>('all');
+  const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
+  const [selectedAgent, setSelectedAgent] = useState<typeof healthMetrics[0] | null>(null);
+  const [insightsDismissed, setInsightsDismissed] = useState<string[]>([]);
 
   const healthyCount = healthMetrics.filter((m) => m.status === 'healthy').length;
   const warningCount = healthMetrics.filter((m) => m.status === 'warning').length;
   const criticalCount = healthMetrics.filter((m) => m.status === 'critical').length;
+  const avgUptime = (healthMetrics.reduce((acc, m) => acc + m.uptime, 0) / healthMetrics.length).toFixed(1);
+  const totalRequests = healthMetrics.reduce((acc, m) => acc + m.requests24h, 0);
 
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages((prev) => [...prev, { role: 'user' as const, content: chatInput }]);
-    setChatInput('');
+  const filteredAgents = healthMetrics.filter(
+    (agent) => statusFilter === 'all' || agent.status === statusFilter
+  );
 
-    setTimeout(() => {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant' as const,
-          content: `**Diagnóstico do Document Analyzer:**
+  const handleDiagnose = (agent: typeof healthMetrics[0]) => {
+    setSelectedAgent(agent);
+    setShowDiagnosticModal(true);
+  };
+
+  const handleAIMessage = async (message: string): Promise<string> => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+
+    if (selectedAgent?.status === 'critical') {
+      return `**Diagnóstico do ${selectedAgent.name}:**
 
 **Análise de logs (últimas 24h):**
 - 127 erros de timeout
@@ -189,13 +255,20 @@ Limite de memória insuficiente para documentos grandes
 
 **Impacto estimado:**
 - Redução de 70% nos erros
-- Custo adicional: ~$50/mês
+- Custo adicional: ~$50/mês`;
+    }
 
-Deseja que eu aplique o fix automaticamente?`,
-        },
-      ]);
-    }, 1500);
+    return `Analisando "${message}" para ${selectedAgent?.name || 'o sistema'}...
+
+Os logs indicam operação normal. Métricas dentro dos parâmetros esperados.
+
+**Recomendações de manutenção preventiva:**
+- Verificar limites de rate limiting
+- Revisar políticas de retry
+- Monitorar tendências de latência`;
   };
+
+  const visibleInsights = aiInsights.filter((i) => !insightsDismissed.includes(i.id));
 
   return (
     <div>
@@ -204,10 +277,24 @@ Deseja que eu aplique o fix automaticamente?`,
         subtitle="Monitoramento de saúde das iniciativas de IA"
       />
 
-      <main className="p-6">
+      <main className="p-6 space-y-6">
+        {/* AI Insights Banner */}
+        {visibleInsights.length > 0 && (
+          <AIInsightBanner
+            insights={visibleInsights}
+            onDismiss={(id) => setInsightsDismissed((prev) => [...prev, id])}
+          />
+        )}
+
         {/* Status Overview */}
-        <div className="grid gap-4 md:grid-cols-4 mb-6">
-          <Card className="border-l-4 border-l-status-success">
+        <div className="grid gap-4 md:grid-cols-5">
+          <Card
+            className={cn(
+              "border-l-4 border-l-status-success cursor-pointer transition-all",
+              statusFilter === 'healthy' && "ring-2 ring-status-success"
+            )}
+            onClick={() => setStatusFilter(statusFilter === 'healthy' ? 'all' : 'healthy')}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -218,7 +305,14 @@ Deseja que eu aplique o fix automaticamente?`,
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-status-warning">
+
+          <Card
+            className={cn(
+              "border-l-4 border-l-status-warning cursor-pointer transition-all",
+              statusFilter === 'warning' && "ring-2 ring-status-warning"
+            )}
+            onClick={() => setStatusFilter(statusFilter === 'warning' ? 'all' : 'warning')}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -229,7 +323,14 @@ Deseja que eu aplique o fix automaticamente?`,
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-status-error">
+
+          <Card
+            className={cn(
+              "border-l-4 border-l-status-error cursor-pointer transition-all",
+              statusFilter === 'critical' && "ring-2 ring-status-error"
+            )}
+            onClick={() => setStatusFilter(statusFilter === 'critical' ? 'all' : 'critical')}
+          >
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -240,43 +341,80 @@ Deseja que eu aplique o fix automaticamente?`,
               </div>
             </CardContent>
           </Card>
+
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-text-muted">Uptime Médio</p>
-                  <p className="text-3xl font-bold text-text">
-                    {(healthMetrics.reduce((acc, m) => acc + m.uptime, 0) / healthMetrics.length).toFixed(1)}%
-                  </p>
+                  <p className="text-3xl font-bold text-text">{avgUptime}%</p>
                 </div>
                 <Activity className="h-8 w-8 text-aimana-teal" />
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-text-muted">Requisições 24h</p>
+                  <p className="text-3xl font-bold text-text">{totalRequests.toLocaleString()}</p>
+                </div>
+                <Zap className="h-8 w-8 text-purple-400" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Agent Health */}
-          <div className="lg:col-span-2 space-y-6">
+        {/* Main Content Grid */}
+        <div className="grid gap-6 lg:grid-cols-4">
+          {/* Agent Health - Full Width */}
+          <div className="lg:col-span-3 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">Saúde dos Agentes</h2>
-              <Button variant="outline" size="sm">
-                <RefreshCw className="h-4 w-4 mr-1" />
-                Atualizar
-              </Button>
+              <div className="flex items-center gap-3">
+                <h2 className="text-lg font-semibold text-text">Saúde dos Agentes</h2>
+                {statusFilter !== 'all' && (
+                  <Badge variant="outline" className="cursor-pointer" onClick={() => setStatusFilter('all')}>
+                    Filtro: {statusConfig[statusFilter].label}
+                    <XCircle className="h-3 w-3 ml-1" />
+                  </Badge>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <AIActionButton
+                  label="Diagnóstico Geral"
+                  action="diagnose"
+                  onClick={() => {
+                    setSelectedAgent(null);
+                    setShowDiagnosticModal(true);
+                  }}
+                  variant="outline"
+                  size="sm"
+                />
+                <Button variant="outline" size="sm">
+                  <RefreshCw className="h-4 w-4 mr-1" />
+                  Atualizar
+                </Button>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              {healthMetrics.map((agent) => {
+            <div className="grid gap-4 md:grid-cols-2">
+              {filteredAgents.map((agent) => {
                 const status = statusConfig[agent.status as keyof typeof statusConfig];
                 return (
-                  <Card key={agent.id} variant="interactive" className={cn(
-                    'border-l-4',
-                    agent.status === 'healthy' && 'border-l-status-success',
-                    agent.status === 'warning' && 'border-l-status-warning',
-                    agent.status === 'critical' && 'border-l-status-error'
-                  )}>
+                  <Card
+                    key={agent.id}
+                    variant="interactive"
+                    className={cn(
+                      'border-l-4',
+                      agent.status === 'healthy' && 'border-l-status-success',
+                      agent.status === 'warning' && 'border-l-status-warning',
+                      agent.status === 'critical' && 'border-l-status-error'
+                    )}
+                  >
                     <CardContent className="p-4">
+                      {/* Header */}
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <div className={cn(
@@ -285,201 +423,237 @@ Deseja que eu aplique o fix automaticamente?`,
                             agent.status === 'warning' && 'bg-status-warning-bg',
                             agent.status === 'critical' && 'bg-status-error-bg'
                           )}>
-                            <status.icon className={cn('h-5 w-5', status.color)} />
+                            <Bot className={cn('h-5 w-5', status.color)} />
                           </div>
                           <div>
                             <h3 className="font-semibold text-text">{agent.name}</h3>
-                            <Badge variant={agent.status === 'healthy' ? 'success' : agent.status === 'warning' ? 'warning' : 'error'}>
-                              {status.label}
-                            </Badge>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <Badge
+                                variant={
+                                  agent.status === 'healthy' ? 'success' :
+                                  agent.status === 'warning' ? 'warning' : 'error'
+                                }
+                                size="sm"
+                              >
+                                {status.label}
+                              </Badge>
+                              <span className="text-xs text-text-muted">v{agent.version}</span>
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-1" />
-                            Detalhes
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <BarChart3 className="h-4 w-4" />
-                          </Button>
-                        </div>
                       </div>
 
-                      <div className="grid grid-cols-4 gap-4">
+                      {/* Metrics Grid */}
+                      <div className="grid grid-cols-4 gap-2 mb-4">
                         <div className="text-center p-2 rounded-lg bg-surface-light">
                           <p className={cn(
-                            'text-lg font-bold',
-                            agent.uptime >= 99 ? 'text-status-success' : agent.uptime >= 95 ? 'text-status-warning' : 'text-status-error'
+                            'text-sm font-bold',
+                            agent.uptime >= 99 ? 'text-status-success' :
+                            agent.uptime >= 95 ? 'text-status-warning' : 'text-status-error'
                           )}>{agent.uptime}%</p>
-                          <p className="text-xs text-text-muted">Uptime</p>
+                          <p className="text-[10px] text-text-muted">Uptime</p>
                         </div>
                         <div className="text-center p-2 rounded-lg bg-surface-light">
                           <p className={cn(
-                            'text-lg font-bold',
-                            agent.latency <= 2 ? 'text-status-success' : agent.latency <= 3 ? 'text-status-warning' : 'text-status-error'
+                            'text-sm font-bold',
+                            agent.latency <= 2 ? 'text-status-success' :
+                            agent.latency <= 3 ? 'text-status-warning' : 'text-status-error'
                           )}>{agent.latency}s</p>
-                          <p className="text-xs text-text-muted">Latência</p>
+                          <p className="text-[10px] text-text-muted">Latência</p>
                         </div>
                         <div className="text-center p-2 rounded-lg bg-surface-light">
                           <p className={cn(
-                            'text-lg font-bold',
-                            agent.errorRate < 1 ? 'text-status-success' : agent.errorRate < 2 ? 'text-status-warning' : 'text-status-error'
+                            'text-sm font-bold',
+                            agent.errorRate < 1 ? 'text-status-success' :
+                            agent.errorRate < 2 ? 'text-status-warning' : 'text-status-error'
                           )}>{agent.errorRate}%</p>
-                          <p className="text-xs text-text-muted">Erro</p>
+                          <p className="text-[10px] text-text-muted">Erros</p>
                         </div>
                         <div className="text-center p-2 rounded-lg bg-surface-light">
-                          <p className="text-lg font-bold text-text">{agent.throughput}/h</p>
-                          <p className="text-xs text-text-muted">Throughput</p>
+                          <p className="text-sm font-bold text-text">{agent.throughput}/h</p>
+                          <p className="text-[10px] text-text-muted">Throughput</p>
                         </div>
                       </div>
 
+                      {/* Resource Usage */}
+                      <div className="flex items-center gap-4 mb-4 text-xs">
+                        <div className="flex items-center gap-2 flex-1">
+                          <Cpu className="h-3 w-3 text-text-muted" />
+                          <div className="flex-1 h-1.5 bg-surface-light rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full",
+                                agent.cpu > 80 ? "bg-status-error" :
+                                agent.cpu > 60 ? "bg-status-warning" : "bg-status-success"
+                              )}
+                              style={{ width: `${agent.cpu}%` }}
+                            />
+                          </div>
+                          <span className="text-text-muted">{agent.cpu}%</span>
+                        </div>
+                        <div className="flex items-center gap-2 flex-1">
+                          <HardDrive className="h-3 w-3 text-text-muted" />
+                          <div className="flex-1 h-1.5 bg-surface-light rounded-full overflow-hidden">
+                            <div
+                              className={cn(
+                                "h-full rounded-full",
+                                agent.memory > 80 ? "bg-status-error" :
+                                agent.memory > 60 ? "bg-status-warning" : "bg-status-success"
+                              )}
+                              style={{ width: `${agent.memory}%` }}
+                            />
+                          </div>
+                          <span className="text-text-muted">{agent.memory}%</span>
+                        </div>
+                      </div>
+
+                      {/* Alerts */}
                       {agent.alerts.length > 0 && (
-                        <div className="mt-3 pt-3 border-t border-surface-border">
-                          <div className="flex flex-wrap gap-2">
+                        <div className="mb-4 p-2 rounded-lg bg-status-error-bg">
+                          <div className="flex flex-wrap gap-1">
                             {agent.alerts.map((alert, idx) => (
-                              <Badge key={idx} variant="error" size="sm">
-                                <AlertTriangle className="h-3 w-3 mr-1" />
+                              <span key={idx} className="text-xs text-status-error flex items-center gap-1">
+                                <AlertTriangle className="h-3 w-3" />
                                 {alert}
-                              </Badge>
+                              </span>
                             ))}
                           </div>
                         </div>
                       )}
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-2 pt-3 border-t border-surface-border">
+                        <Button variant="outline" size="sm" className="flex-1">
+                          <Eye className="h-3 w-3 mr-1" />
+                          Logs
+                        </Button>
+                        <Button variant="outline" size="sm" className="flex-1">
+                          {agent.status === 'critical' ? (
+                            <>
+                              <Pause className="h-3 w-3 mr-1" />
+                              Pausar
+                            </>
+                          ) : (
+                            <>
+                              <RotateCcw className="h-3 w-3 mr-1" />
+                              Reiniciar
+                            </>
+                          )}
+                        </Button>
+                        <AIActionButton
+                          label="Diagnóstico"
+                          action="diagnose"
+                          onClick={() => handleDiagnose(agent)}
+                          variant="outline"
+                          size="sm"
+                        />
+                      </div>
                     </CardContent>
                   </Card>
                 );
               })}
             </div>
-
-            {/* Recent Incidents */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Incidentes Recentes</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {recentIncidents.map((incident) => (
-                    <div
-                      key={incident.id}
-                      className={cn(
-                        'flex items-start gap-3 p-3 rounded-lg',
-                        incident.status === 'open' ? 'bg-status-error-bg' : 'bg-surface-light'
-                      )}
-                    >
-                      <div className={cn(
-                        'mt-0.5',
-                        incident.severity === 'high' && 'text-status-error',
-                        incident.severity === 'medium' && 'text-status-warning',
-                        incident.severity === 'low' && 'text-text-muted'
-                      )}>
-                        {incident.status === 'open' ? (
-                          <XCircle className="h-4 w-4" />
-                        ) : (
-                          <CheckCircle2 className="h-4 w-4 text-status-success" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-text text-sm">{incident.agent}</span>
-                          <Badge variant={incident.status === 'open' ? 'error' : 'success'} size="sm">
-                            {incident.status === 'open' ? 'Aberto' : 'Resolvido'}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-text-secondary">{incident.description}</p>
-                        <p className="text-xs text-text-muted mt-1">{incident.timestamp}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Agent Chat */}
+            {/* System Health */}
             <Card>
-              <CardHeader className="border-b border-surface-border">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-aimana-teal">
-                    <Bot className="h-5 w-5 text-aimana-navy" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">HealthAgent</CardTitle>
-                    <CardDescription>Diagnóstico de saúde</CardDescription>
-                  </div>
-                </div>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Server className="h-4 w-4 text-aimana-teal" />
+                  Infraestrutura
+                </CardTitle>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-64 overflow-y-auto p-4 space-y-3 scrollbar-thin">
-                  {chatMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'rounded-lg px-3 py-2 text-sm',
-                        msg.role === 'user'
-                          ? 'bg-aimana-navy text-white ml-8'
-                          : 'bg-surface-light text-text mr-4'
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+              <CardContent className="space-y-3">
+                {systemHealth.map((system, idx) => {
+                  const Icon = system.icon;
+                  return (
+                    <div key={idx} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className={cn(
+                          'w-2 h-2 rounded-full',
+                          system.status === 'healthy' ? 'bg-status-success' : 'bg-status-warning'
+                        )} />
+                        <Icon className="h-3.5 w-3.5 text-text-muted" />
+                        <span className="text-sm text-text">{system.name}</span>
+                      </div>
+                      <span className={cn(
+                        'text-xs font-medium',
+                        system.uptime >= 99.9 ? 'text-status-success' :
+                        system.uptime >= 99 ? 'text-status-warning' : 'text-status-error'
+                      )}>{system.uptime}%</span>
                     </div>
-                  ))}
-                </div>
-                <div className="border-t border-surface-border p-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Pergunte sobre a saúde..."
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
-                      inputSize="sm"
-                    />
-                    <Button size="sm" onClick={handleChatSend}>
-                      <Send className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
+                  );
+                })}
               </CardContent>
             </Card>
 
-            {/* System Health */}
+            {/* Recent Incidents */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Infraestrutura</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <AlertTriangle className="h-4 w-4 text-status-warning" />
+                  Incidentes Recentes
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {systemHealth.map((system, idx) => (
-                  <div key={idx} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+              <CardContent className="space-y-2">
+                {recentIncidents.slice(0, 4).map((incident) => (
+                  <div
+                    key={incident.id}
+                    className={cn(
+                      'p-2 rounded-lg text-xs',
+                      incident.status === 'open' ? 'bg-status-error-bg' : 'bg-surface-light'
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium text-text">{incident.agent}</span>
                       <div className={cn(
-                        'w-2 h-2 rounded-full',
-                        system.status === 'healthy' ? 'bg-status-success' : 'bg-status-warning'
+                        'w-1.5 h-1.5 rounded-full',
+                        incident.status === 'open' ? 'bg-status-error' : 'bg-status-success'
                       )} />
-                      <span className="text-sm text-text">{system.name}</span>
                     </div>
-                    <span className="text-xs text-text-muted">{system.uptime}%</span>
+                    <p className="text-text-secondary line-clamp-1">{incident.description}</p>
+                    <p className="text-text-muted mt-1">{incident.timestamp}</p>
                   </div>
                 ))}
+                <Button variant="ghost" size="sm" className="w-full text-xs">
+                  Ver todos os incidentes
+                </Button>
               </CardContent>
             </Card>
 
             {/* Quick Actions */}
             <Card className="bg-gradient-header text-white">
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Ações Rápidas</h3>
-                <div className="space-y-2 text-sm">
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
-                    <Server className="h-4 w-4 mr-2" />
-                    Reiniciar Agente
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Zap className="h-4 w-4" />
+                  Ações Rápidas
+                </h3>
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Reiniciar Todos
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                  >
                     <Database className="h-4 w-4 mr-2" />
-                    Limpar Cache
+                    Limpar Cache Global
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
-                    <Shield className="h-4 w-4 mr-2" />
-                    Rollback Versão
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Exportar Relatório
                   </Button>
                 </div>
               </CardContent>
@@ -487,6 +661,58 @@ Deseja que eu aplique o fix automaticamente?`,
           </div>
         </div>
       </main>
+
+      {/* AI Diagnostic Modal */}
+      <AIModal
+        title={selectedAgent ? `Diagnóstico: ${selectedAgent.name}` : 'Diagnóstico Geral'}
+        description={selectedAgent
+          ? `Análise detalhada de saúde e performance`
+          : 'Análise completa do sistema de agentes'
+        }
+        isOpen={showDiagnosticModal}
+        onClose={() => {
+          setShowDiagnosticModal(false);
+          setSelectedAgent(null);
+        }}
+        agentName="HealthAgent"
+        agentDescription="Especialista em diagnóstico e otimização de agentes de IA"
+        initialMessage={selectedAgent
+          ? `Analisando ${selectedAgent.name}...
+
+**Status atual:** ${statusConfig[selectedAgent.status as keyof typeof statusConfig].label}
+**Uptime:** ${selectedAgent.uptime}%
+**Taxa de erro:** ${selectedAgent.errorRate}%
+**Latência média:** ${selectedAgent.latency}s
+
+${selectedAgent.alerts.length > 0
+  ? `**Alertas ativos:**\n${selectedAgent.alerts.map(a => `⚠️ ${a}`).join('\n')}\n\n`
+  : ''}Como posso ajudar no diagnóstico?`
+          : `**Resumo do Sistema:**
+
+✅ ${healthyCount} agentes saudáveis
+⚠️ ${warningCount} agentes com atenção
+❌ ${criticalCount} agentes críticos
+
+**Uptime médio:** ${avgUptime}%
+**Requisições 24h:** ${totalRequests.toLocaleString()}
+
+${criticalCount > 0 ? '**Ação recomendada:** Investigar agentes críticos imediatamente.' : ''}
+
+O que você gostaria de analisar?`
+        }
+        suggestedPrompts={selectedAgent ? [
+          'Analisar logs de erro',
+          'Identificar causa raiz',
+          'Sugerir otimizações',
+          'Gerar relatório completo',
+        ] : [
+          'Diagnóstico de agentes críticos',
+          'Análise de tendências',
+          'Recomendações de otimização',
+          'Relatório de saúde geral',
+        ]}
+        onSendMessage={handleAIMessage}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
  * ═══════════════════════════════════════════════════════════════════════════
  * AIMANA JOURNEY - Executive Reports Page
  * Relatórios executivos e dashboards para liderança
+ * Layout full-width com workflow de geração eficiente
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
@@ -25,15 +26,27 @@ import {
   TrendingUp,
   PieChart,
   BarChart3,
-  Bot,
-  Send,
   Share2,
   Eye,
   Plus,
   Settings,
   Sparkles,
+  Mail,
+  Users,
+  Play,
+  Pause,
+  Edit2,
+  Trash2,
+  Copy,
+  Send,
+  CheckCircle2,
+  AlertTriangle,
+  FileSpreadsheet,
+  Presentation,
+  File,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AIInsightBanner, AIActionButton, AIModal } from '@/components/ai';
 
 // Available reports
 const reports = [
@@ -46,6 +59,8 @@ const reports = [
     lastGenerated: '2025-02-05 08:00',
     icon: PieChart,
     audience: 'C-Level',
+    views: 15,
+    scheduled: false,
   },
   {
     id: 2,
@@ -56,6 +71,8 @@ const reports = [
     lastGenerated: '2025-02-01 09:00',
     icon: TrendingUp,
     audience: 'CFO, Board',
+    views: 12,
+    scheduled: true,
   },
   {
     id: 3,
@@ -66,6 +83,8 @@ const reports = [
     lastGenerated: '2025-02-03 10:00',
     icon: BarChart3,
     audience: 'CTO, Tech Leads',
+    views: 18,
+    scheduled: true,
   },
   {
     id: 4,
@@ -76,95 +95,152 @@ const reports = [
     lastGenerated: '2025-01-15 14:00',
     icon: FileText,
     audience: 'Legal, Compliance',
+    views: 5,
+    scheduled: true,
+  },
+  {
+    id: 5,
+    name: 'Maturity Progress',
+    description: 'Evolução do diagnóstico de maturidade',
+    type: 'report',
+    frequency: 'Mensal',
+    lastGenerated: '2025-02-01 11:00',
+    icon: TrendingUp,
+    audience: 'CEO, CDO',
+    views: 8,
+    scheduled: false,
+  },
+  {
+    id: 6,
+    name: 'Health Dashboard',
+    description: 'Status de saúde de todos os agentes',
+    type: 'dashboard',
+    frequency: 'Tempo real',
+    lastGenerated: '2025-02-05 09:30',
+    icon: BarChart3,
+    audience: 'CTO, Ops',
+    views: 22,
+    scheduled: false,
   },
 ];
 
 // Scheduled reports
 const scheduledReports = [
-  { name: 'ROI Mensal', nextRun: '2025-03-01 09:00', recipients: 5 },
-  { name: 'Agent Performance', nextRun: '2025-02-10 10:00', recipients: 8 },
-  { name: 'Portfolio Summary', nextRun: '2025-02-06 08:00', recipients: 12 },
+  {
+    id: 1,
+    name: 'ROI Mensal',
+    nextRun: '2025-03-01 09:00',
+    recipients: ['cfo@empresa.com', 'ceo@empresa.com', '+3 outros'],
+    format: 'PDF',
+    active: true,
+  },
+  {
+    id: 2,
+    name: 'Agent Performance',
+    nextRun: '2025-02-10 10:00',
+    recipients: ['cto@empresa.com', 'tech-leads@empresa.com'],
+    format: 'PDF + Excel',
+    active: true,
+  },
+  {
+    id: 3,
+    name: 'Portfolio Summary',
+    nextRun: '2025-02-06 08:00',
+    recipients: ['board@empresa.com'],
+    format: 'PPT',
+    active: true,
+  },
+  {
+    id: 4,
+    name: 'Governance Status',
+    nextRun: '2025-04-01 14:00',
+    recipients: ['legal@empresa.com', 'compliance@empresa.com'],
+    format: 'PDF',
+    active: false,
+  },
 ];
 
-// Report insights
-const insights = [
+// AI Insights
+const aiInsights = [
   {
-    title: 'ROI acima da meta',
-    description: 'Customer Support Agent atingiu 220% de ROI, superando a meta de 200%',
-    type: 'positive',
+    id: '1',
+    type: 'positive' as const,
+    title: 'ROI Acima da Meta',
+    description: 'Customer Support Agent atingiu 220% de ROI. Incluir case de sucesso no próximo relatório executivo.',
   },
   {
-    title: 'Projeto em risco',
-    description: 'Document Analyzer com ROI negativo precisa de ação imediata',
-    type: 'negative',
+    id: '2',
+    type: 'warning' as const,
+    title: 'Projeto em Risco',
+    description: 'Document Analyzer precisa ser reportado com plano de ação. Sugestão de slides disponível.',
+    action: {
+      label: 'Gerar Slides',
+      onClick: () => {},
+    },
   },
   {
-    title: 'Oportunidade identificada',
-    description: 'Expansão do Sales Assistant pode gerar +R$150k/ano',
-    type: 'opportunity',
+    id: '3',
+    type: 'suggestion' as const,
+    title: 'Oportunidade de Expansão',
+    description: 'Dados indicam potencial de +R$150k/ano com expansão do Sales Assistant. Incluir proposta?',
   },
 ];
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+// Report templates
+const reportTemplates = [
+  { name: 'Resumo Executivo', description: 'Visão geral para C-Level', icon: FileText },
+  { name: 'Análise de ROI', description: 'Detalhamento financeiro', icon: TrendingUp },
+  { name: 'Performance Técnica', description: 'Métricas de agentes', icon: BarChart3 },
+  { name: 'Roadmap & Próximos Passos', description: 'Planejamento estratégico', icon: Calendar },
+];
 
 export function ExecutiveReports() {
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      role: 'assistant',
-      content: `Olá! Sou o **ReportsAgent**. Posso ajudá-lo a:
+  const [showGenerateModal, setShowGenerateModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedReport, setSelectedReport] = useState<typeof reports[0] | null>(null);
+  const [insightsDismissed, setInsightsDismissed] = useState<string[]>([]);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-• Gerar relatórios sob demanda
-• Configurar envios automáticos
-• Criar dashboards personalizados
-• Extrair insights de dados
+  const handleGenerateReport = (report?: typeof reports[0]) => {
+    setSelectedReport(report || null);
+    setShowGenerateModal(true);
+  };
 
-**Relatórios mais acessados:**
-1. AI Portfolio Overview (15 visualizações/semana)
-2. ROI Mensal (12 visualizações/semana)
+  const handleScheduleReport = (report?: typeof reports[0]) => {
+    setSelectedReport(report || null);
+    setShowScheduleModal(true);
+  };
 
-Qual relatório deseja gerar?`,
-    },
-  ]);
+  const handleAIMessage = async (message: string): Promise<string> => {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages((prev) => [...prev, { role: 'user' as const, content: chatInput }]);
-    setChatInput('');
-
-    setTimeout(() => {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant' as const,
-          content: `Gerando **Relatório Executivo para o Board**...
+    return `Gerando **${selectedReport?.name || 'Relatório Personalizado'}**...
 
 **Estrutura sugerida:**
 
 1. **Sumário Executivo**
    - ROI Global: 84%
-   - Investimento total: R$610k
-   - Economia gerada: R$1.125k
+   - Investimento total: R$730k
+   - Economia gerada: R$1.320k
 
-2. **Destaques**
-   - Customer Support: sucesso comprovado
-   - Pipeline: 2 projetos em execução
+2. **Destaques do Período**
+   - Customer Support: ROI de 220%
+   - 2 novos projetos em pipeline
 
 3. **Riscos e Mitigações**
-   - Document Analyzer: plano de recuperação
+   - Document Analyzer: plano de recuperação em andamento
 
 4. **Próximos Passos**
    - Aprovação para Scale do Sales Assistant
    - Budget Q2 para novos projetos
 
-O relatório está sendo gerado em PDF.
-Tempo estimado: 30 segundos.
+**Formato:** PDF + PPT
+**Tempo estimado:** 30 segundos
 
-Deseja adicionar alguma seção customizada?`,
-        },
-      ]);
-    }, 1500);
+Deseja ajustar alguma seção antes de gerar?`;
   };
+
+  const visibleInsights = aiInsights.filter((i) => !insightsDismissed.includes(i.id));
 
   return (
     <div>
@@ -173,64 +249,98 @@ Deseja adicionar alguma seção customizada?`,
         subtitle="Dashboards e relatórios para a liderança"
       />
 
-      <main className="p-6">
+      <main className="p-6 space-y-6">
+        {/* AI Insights Banner */}
+        {visibleInsights.length > 0 && (
+          <AIInsightBanner
+            insights={visibleInsights}
+            onDismiss={(id) => setInsightsDismissed((prev) => [...prev, id])}
+          />
+        )}
+
         {/* Quick Actions */}
-        <div className="grid gap-4 md:grid-cols-4 mb-6">
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" variant="interactive">
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card
+            className="cursor-pointer hover:shadow-md hover:border-aimana-teal transition-all"
+            variant="interactive"
+            onClick={() => handleGenerateReport()}
+          >
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-aimana-teal/10 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-aimana-teal" />
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-teal-500/20 to-purple-500/20 flex items-center justify-center">
+                <Sparkles className="h-6 w-6 text-aimana-teal" />
               </div>
               <div>
-                <p className="font-medium text-text">Gerar com IA</p>
+                <p className="font-semibold text-text">Gerar com IA</p>
                 <p className="text-xs text-text-muted">Relatório personalizado</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" variant="interactive">
+
+          <Card
+            className="cursor-pointer hover:shadow-md transition-all"
+            variant="interactive"
+          >
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-phase-plan-bg flex items-center justify-center">
-                <PieChart className="h-5 w-5 text-phase-plan" />
+              <div className="h-12 w-12 rounded-xl bg-phase-plan-bg flex items-center justify-center">
+                <PieChart className="h-6 w-6 text-phase-plan" />
               </div>
               <div>
-                <p className="font-medium text-text">Dashboard</p>
-                <p className="text-xs text-text-muted">Tempo real</p>
+                <p className="font-semibold text-text">Dashboard Live</p>
+                <p className="text-xs text-text-muted">Dados em tempo real</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" variant="interactive">
+
+          <Card
+            className="cursor-pointer hover:shadow-md transition-all"
+            variant="interactive"
+            onClick={() => handleScheduleReport()}
+          >
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-phase-execute-bg flex items-center justify-center">
-                <Calendar className="h-5 w-5 text-phase-execute" />
+              <div className="h-12 w-12 rounded-xl bg-phase-execute-bg flex items-center justify-center">
+                <Calendar className="h-6 w-6 text-phase-execute" />
               </div>
               <div>
-                <p className="font-medium text-text">Agendar</p>
-                <p className="text-xs text-text-muted">Envio automático</p>
+                <p className="font-semibold text-text">Agendar Envio</p>
+                <p className="text-xs text-text-muted">Automação de relatórios</p>
               </div>
             </CardContent>
           </Card>
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" variant="interactive">
+
+          <Card
+            className="cursor-pointer hover:shadow-md transition-all"
+            variant="interactive"
+          >
             <CardContent className="p-4 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-phase-manage-bg flex items-center justify-center">
-                <Plus className="h-5 w-5 text-phase-manage" />
+              <div className="h-12 w-12 rounded-xl bg-phase-manage-bg flex items-center justify-center">
+                <Plus className="h-6 w-6 text-phase-manage" />
               </div>
               <div>
-                <p className="font-medium text-text">Novo Template</p>
-                <p className="text-xs text-text-muted">Criar modelo</p>
+                <p className="font-semibold text-text">Novo Template</p>
+                <p className="text-xs text-text-muted">Criar modelo customizado</p>
               </div>
             </CardContent>
           </Card>
         </div>
 
+        {/* Main Content Grid */}
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Reports List */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* Reports List - 2 columns */}
+          <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-text">Relatórios Disponíveis</h2>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-1" />
-                Configurar
-              </Button>
+              <div className="flex items-center gap-2">
+                <AIActionButton
+                  label="Sugestões IA"
+                  action="suggest"
+                  onClick={() => handleGenerateReport()}
+                  variant="outline"
+                  size="sm"
+                />
+                <Button variant="outline" size="sm">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -238,40 +348,67 @@ Deseja adicionar alguma seção customizada?`,
                 <Card key={report.id} variant="interactive">
                   <CardContent className="p-4">
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="h-10 w-10 rounded-lg bg-surface-light flex items-center justify-center">
-                        <report.icon className="h-5 w-5 text-aimana-navy" />
+                      <div className={cn(
+                        "h-10 w-10 rounded-lg flex items-center justify-center",
+                        report.type === 'dashboard' ? 'bg-phase-execute-bg' : 'bg-phase-plan-bg'
+                      )}>
+                        <report.icon className={cn(
+                          "h-5 w-5",
+                          report.type === 'dashboard' ? 'text-phase-execute' : 'text-phase-plan'
+                        )} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-text">{report.name}</h3>
-                        <p className="text-sm text-text-secondary">{report.description}</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-text">{report.name}</h3>
+                          {report.scheduled && (
+                            <Badge variant="success" size="sm">
+                              <Clock className="h-2.5 w-2.5 mr-0.5" />
+                              Agendado
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-text-secondary line-clamp-1">{report.description}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 mb-3">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <Badge variant={report.type === 'dashboard' ? 'execute' : 'plan'} size="sm">
                         {report.type === 'dashboard' ? 'Dashboard' : 'Relatório'}
                       </Badge>
                       <Badge variant="outline" size="sm">{report.frequency}</Badge>
+                      <span className="text-xs text-text-muted ml-auto">{report.views} views</span>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-text-muted mb-3">
                       <span className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        Último: {report.lastGenerated}
+                        {report.lastGenerated}
                       </span>
-                      <span>{report.audience}</span>
+                      <span className="flex items-center gap-1">
+                        <Users className="h-3 w-3" />
+                        {report.audience}
+                      </span>
                     </div>
 
                     <div className="flex gap-2">
                       <Button variant="outline" size="sm" className="flex-1">
-                        <Eye className="h-4 w-4 mr-1" />
-                        Visualizar
+                        <Eye className="h-3 w-3 mr-1" />
+                        Ver
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1"
+                        onClick={() => handleGenerateReport(report)}
+                      >
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        Gerar
                       </Button>
                       <Button variant="outline" size="sm">
-                        <Download className="h-4 w-4" />
+                        <Download className="h-3 w-3" />
                       </Button>
                       <Button variant="outline" size="sm">
-                        <Share2 className="h-4 w-4" />
+                        <Share2 className="h-3 w-3" />
                       </Button>
                     </div>
                   </CardContent>
@@ -279,119 +416,154 @@ Deseja adicionar alguma seção customizada?`,
               ))}
             </div>
 
-            {/* AI Insights */}
+            {/* Quick Templates */}
             <Card>
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-5 w-5 text-aimana-teal" />
-                  <CardTitle className="text-base">Insights Gerados por IA</CardTitle>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-aimana-teal" />
+                    Templates Rápidos
+                  </CardTitle>
+                  <Button variant="ghost" size="sm">
+                    <Plus className="h-4 w-4 mr-1" />
+                    Criar
+                  </Button>
                 </div>
-                <CardDescription>Análise automática dos dados do portfólio</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {insights.map((insight, idx) => (
-                  <div
-                    key={idx}
-                    className={cn(
-                      'p-3 rounded-lg',
-                      insight.type === 'positive' && 'bg-status-success-bg',
-                      insight.type === 'negative' && 'bg-status-error-bg',
-                      insight.type === 'opportunity' && 'bg-aimana-teal/10'
-                    )}
-                  >
-                    <p className="font-medium text-text text-sm">{insight.title}</p>
-                    <p className="text-xs text-text-secondary mt-1">{insight.description}</p>
-                  </div>
-                ))}
+              <CardContent>
+                <div className="grid gap-2 md:grid-cols-2">
+                  {reportTemplates.map((template, idx) => (
+                    <Button
+                      key={idx}
+                      variant="outline"
+                      className="justify-start h-auto py-3"
+                      onClick={() => handleGenerateReport()}
+                    >
+                      <template.icon className="h-4 w-4 mr-2 text-text-muted" />
+                      <div className="text-left">
+                        <p className="font-medium">{template.name}</p>
+                        <p className="text-xs text-text-muted">{template.description}</p>
+                      </div>
+                    </Button>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Agent Chat */}
+            {/* Scheduled Reports */}
             <Card>
-              <CardHeader className="border-b border-surface-border">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-aimana-teal">
-                    <Bot className="h-5 w-5 text-aimana-navy" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">ReportsAgent</CardTitle>
-                    <CardDescription>Geração de relatórios</CardDescription>
-                  </div>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-phase-execute" />
+                    Envios Agendados
+                  </CardTitle>
+                  <Badge variant="execute">{scheduledReports.filter(r => r.active).length} ativos</Badge>
                 </div>
               </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-64 overflow-y-auto p-4 space-y-3 scrollbar-thin">
-                  {chatMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'rounded-lg px-3 py-2 text-sm',
-                        msg.role === 'user'
-                          ? 'bg-aimana-navy text-white ml-8'
-                          : 'bg-surface-light text-text mr-4'
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+              <CardContent className="space-y-3">
+                {scheduledReports.map((report) => (
+                  <div
+                    key={report.id}
+                    className={cn(
+                      "p-3 rounded-lg",
+                      report.active ? 'bg-surface-light' : 'bg-surface-light/50 opacity-60'
+                    )}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium text-text text-sm">{report.name}</span>
+                      <div className="flex items-center gap-1">
+                        {report.active ? (
+                          <CheckCircle2 className="h-3.5 w-3.5 text-status-success" />
+                        ) : (
+                          <Pause className="h-3.5 w-3.5 text-text-muted" />
+                        )}
+                      </div>
                     </div>
-                  ))}
-                </div>
-                <div className="border-t border-surface-border p-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Peça um relatório..."
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
-                      inputSize="sm"
-                    />
-                    <Button size="sm" onClick={handleChatSend}>
-                      <Send className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2 text-xs text-text-muted mb-2">
+                      <Clock className="h-3 w-3" />
+                      <span>{report.nextRun}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-1 text-text-muted">
+                        <Mail className="h-3 w-3" />
+                        <span>{report.recipients.length > 2 ? `${report.recipients.slice(0, 2).join(', ')}...` : report.recipients.join(', ')}</span>
+                      </div>
+                      <Badge variant="outline" size="sm">{report.format}</Badge>
+                    </div>
                   </div>
-                </div>
+                ))}
+                <Button variant="ghost" size="sm" className="w-full" onClick={() => handleScheduleReport()}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Novo Agendamento
+                </Button>
               </CardContent>
             </Card>
 
-            {/* Scheduled Reports */}
+            {/* Export Formats */}
             <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Envios Agendados</CardTitle>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Download className="h-4 w-4 text-text-muted" />
+                  Formatos de Exportação
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                {scheduledReports.map((report, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-2 rounded-lg bg-surface-light">
-                    <div>
-                      <p className="text-sm font-medium text-text">{report.name}</p>
-                      <p className="text-xs text-text-muted">{report.nextRun}</p>
-                    </div>
-                    <Badge variant="outline" size="sm">{report.recipients} dest.</Badge>
-                  </div>
-                ))}
+              <CardContent className="space-y-2">
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <File className="h-4 w-4 mr-2 text-red-500" />
+                  PDF - Relatório Completo
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <Presentation className="h-4 w-4 mr-2 text-orange-500" />
+                  PowerPoint - Apresentação
+                </Button>
+                <Button variant="outline" size="sm" className="w-full justify-start">
+                  <FileSpreadsheet className="h-4 w-4 mr-2 text-green-500" />
+                  Excel - Dados Detalhados
+                </Button>
               </CardContent>
             </Card>
 
             {/* Quick Generate */}
             <Card className="bg-gradient-header text-white">
               <CardContent className="p-4">
-                <h3 className="font-semibold mb-3">Geração Rápida</h3>
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Sparkles className="h-4 w-4" />
+                  Geração Inteligente
+                </h3>
                 <p className="text-sm text-white/80 mb-4">
-                  Descreva o relatório que precisa e a IA gerará automaticamente.
+                  IA gera relatórios completos com insights automaticamente.
                 </p>
                 <div className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                    onClick={() => handleGenerateReport()}
+                  >
                     <FileText className="h-4 w-4 mr-2" />
                     Resumo para Board
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                    onClick={() => handleGenerateReport()}
+                  >
                     <TrendingUp className="h-4 w-4 mr-2" />
-                    Análise de ROI
+                    Análise Financeira
                   </Button>
-                  <Button variant="outline" size="sm" className="w-full border-white/30 text-white hover:bg-white/10 justify-start">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full border-white/30 text-white hover:bg-white/10 justify-start"
+                    onClick={() => handleGenerateReport()}
+                  >
                     <BarChart3 className="h-4 w-4 mr-2" />
-                    Performance Semanal
+                    Performance Mensal
                   </Button>
                 </div>
               </CardContent>
@@ -399,6 +571,99 @@ Deseja adicionar alguma seção customizada?`,
           </div>
         </div>
       </main>
+
+      {/* AI Generate Report Modal */}
+      <AIModal
+        title={selectedReport ? `Gerar: ${selectedReport.name}` : 'Gerar Relatório'}
+        description="Assistente de geração de relatórios executivos"
+        isOpen={showGenerateModal}
+        onClose={() => {
+          setShowGenerateModal(false);
+          setSelectedReport(null);
+        }}
+        agentName="ReportsAgent"
+        agentDescription="Especialista em relatórios executivos e apresentações"
+        initialMessage={selectedReport
+          ? `Preparando **${selectedReport.name}**...
+
+**Dados disponíveis:**
+- Período: Último mês
+- Audiência: ${selectedReport.audience}
+- Formato sugerido: PDF + PPT
+
+**Seções incluídas:**
+1. Sumário Executivo
+2. Métricas Principais
+3. Destaques e Alertas
+4. Próximos Passos
+
+Deseja customizar alguma seção ou adicionar dados específicos?`
+          : `Olá! Posso ajudá-lo a gerar relatórios executivos.
+
+**Opções disponíveis:**
+• Resumo Executivo para Board
+• Análise de ROI Detalhada
+• Performance de Agentes
+• Relatório de Governança
+• Relatório Customizado
+
+**Formatos de exportação:**
+📄 PDF | 📊 PowerPoint | 📈 Excel
+
+Qual relatório deseja gerar?`
+        }
+        suggestedPrompts={selectedReport ? [
+          'Gerar agora',
+          'Adicionar comparativo',
+          'Incluir projeções',
+          'Customizar seções',
+        ] : [
+          'Resumo para o Board',
+          'Análise de ROI completa',
+          'Performance dos agentes',
+          'Relatório customizado',
+        ]}
+        onSendMessage={handleAIMessage}
+      />
+
+      {/* Schedule Report Modal */}
+      <AIModal
+        title="Agendar Relatório"
+        description="Configure envios automáticos de relatórios"
+        isOpen={showScheduleModal}
+        onClose={() => {
+          setShowScheduleModal(false);
+          setSelectedReport(null);
+        }}
+        agentName="ReportsAgent"
+        agentDescription="Especialista em automação de relatórios"
+        initialMessage={`Vamos configurar o envio automático de relatórios.
+
+**Opções de frequência:**
+• Diário (08:00)
+• Semanal (Segunda-feira)
+• Mensal (Dia 1)
+• Trimestral
+
+**Formatos disponíveis:**
+• PDF - Relatório completo
+• PPT - Apresentação executiva
+• Excel - Dados para análise
+
+**Canais de entrega:**
+• Email
+• Slack
+• Teams
+
+Qual relatório deseja agendar?`}
+        suggestedPrompts={[
+          'Agendar ROI Mensal',
+          'Configurar envio semanal',
+          'Adicionar destinatários',
+          'Ver agendamentos ativos',
+        ]}
+        onSendMessage={handleAIMessage}
+      />
     </div>
   );
 }

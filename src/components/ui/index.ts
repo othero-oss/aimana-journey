@@ -36,3 +36,14 @@ export {
   progressFillVariants,
 } from './progress';
 export type { ProgressProps } from './progress';
+
+// Tabs
+export {
+  Tabs,
+  TabsContent,
+  TabsRoot,
+  TabsList,
+  TabsTrigger,
+  TabsContentCompound,
+  useTabsContext,
+} from './tabs';

@@ -1,7 +1,7 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
  * AIMANA JOURNEY - Portfolio Dashboard Page
- * Visão consolidada de todas as iniciativas de IA
+ * Reestruturado: Layout full-width, sem chat, com insights IA no topo
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
@@ -18,6 +18,7 @@ import {
   Input,
   Progress,
 } from '@/components/ui';
+import { AIInsightBanner, AIActionButton } from '@/components/ai';
 import {
   LayoutGrid,
   List,
@@ -27,14 +28,23 @@ import {
   DollarSign,
   Clock,
   Target,
-  Bot,
-  Send,
   ArrowRight,
   MoreVertical,
   Calendar,
   Users,
   AlertTriangle,
   CheckCircle2,
+  Search,
+  Plus,
+  Download,
+  PieChart,
+  Activity,
+  Sparkles,
+  ChevronRight,
+  Eye,
+  Edit,
+  Pause,
+  Play,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -52,8 +62,10 @@ const initiatives = [
     savings: 480000,
     timeline: 'Q1 2025',
     owner: 'Maria Santos',
+    team: 'Customer Success',
     priority: 'high',
     health: 'green',
+    lastUpdate: '2 dias atrás',
   },
   {
     id: 2,
@@ -67,8 +79,10 @@ const initiatives = [
     savings: 360000,
     timeline: 'Q2 2025',
     owner: 'Carlos Lima',
+    team: 'Comercial',
     priority: 'high',
     health: 'yellow',
+    lastUpdate: '1 dia atrás',
   },
   {
     id: 3,
@@ -82,8 +96,10 @@ const initiatives = [
     savings: 76000,
     timeline: 'Q2 2025',
     owner: 'Ana Costa',
+    team: 'Operações',
     priority: 'medium',
     health: 'red',
+    lastUpdate: '5 dias atrás',
   },
   {
     id: 4,
@@ -97,8 +113,10 @@ const initiatives = [
     savings: 90000,
     timeline: 'Q3 2025',
     owner: 'Roberto Silva',
+    team: 'RH',
     priority: 'medium',
     health: 'green',
+    lastUpdate: '3 dias atrás',
   },
   {
     id: 5,
@@ -112,161 +130,292 @@ const initiatives = [
     savings: 750000,
     timeline: 'Q4 2025',
     owner: 'Carlos Lima',
+    team: 'Operações',
     priority: 'high',
     health: 'green',
+    lastUpdate: '1 semana atrás',
   },
 ];
 
 const phaseConfig = {
-  Planejar: { color: 'bg-phase-plan', badge: 'plan' as const },
-  Executar: { color: 'bg-phase-execute', badge: 'execute' as const },
-  Gerir: { color: 'bg-phase-manage', badge: 'manage' as const },
+  Planejar: { color: 'bg-purple-500', textColor: 'text-purple-400', badge: 'plan' as const },
+  Executar: { color: 'bg-blue-500', textColor: 'text-blue-400', badge: 'execute' as const },
+  Gerir: { color: 'bg-teal-500', textColor: 'text-teal-400', badge: 'manage' as const },
 };
 
 const healthConfig = {
-  green: { color: 'text-status-success', bg: 'bg-status-success', label: 'No prazo' },
-  yellow: { color: 'text-status-warning', bg: 'bg-status-warning', label: 'Atenção' },
-  red: { color: 'text-status-error', bg: 'bg-status-error', label: 'Em risco' },
+  green: { color: 'text-emerald-400', bg: 'bg-emerald-500', bgLight: 'bg-emerald-500/20', label: 'No prazo' },
+  yellow: { color: 'text-amber-400', bg: 'bg-amber-500', bgLight: 'bg-amber-500/20', label: 'Atenção' },
+  red: { color: 'text-red-400', bg: 'bg-red-500', bgLight: 'bg-red-500/20', label: 'Em risco' },
 };
 
-type ChatMessage = { role: 'user' | 'assistant'; content: string };
+const statusConfig = {
+  active: { label: 'Ativo', color: 'text-emerald-400', icon: Play },
+  paused: { label: 'Pausado', color: 'text-amber-400', icon: Pause },
+  planning: { label: 'Planejando', color: 'text-blue-400', icon: Edit },
+};
 
 export function Portfolio() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [chatInput, setChatInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    {
-      role: 'assistant',
-      content: `Olá! Sou o **PortfolioAgent**. Visão geral do portfólio:
-
-**Status:**
-• 5 iniciativas ativas
-• ROI médio projetado: 199%
-• 1 projeto em risco (Extração de Documentos)
-
-**Destaques:**
-✅ Automação de Atendimento: ROI de 320%
-⚠️ Análise Preditiva: atraso de 2 semanas
-
-Posso ajudar a priorizar ou realocar recursos?`,
-    },
-  ]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterPhase, setFilterPhase] = useState<string | null>(null);
+  const [filterHealth, setFilterHealth] = useState<string | null>(null);
 
   const totalInvestment = initiatives.reduce((acc, i) => acc + i.investment, 0);
   const totalSavings = initiatives.reduce((acc, i) => acc + i.savings, 0);
   const avgROI = Math.round(initiatives.reduce((acc, i) => acc + i.roi, 0) / initiatives.length);
+  const atRiskCount = initiatives.filter((i) => i.health === 'red').length;
 
-  const handleChatSend = () => {
-    if (!chatInput.trim()) return;
-    setChatMessages((prev) => [...prev, { role: 'user' as const, content: chatInput }]);
-    setChatInput('');
+  const insights = [
+    {
+      id: '1',
+      type: 'warning' as const,
+      title: '1 projeto em risco requer atenção',
+      description: 'Extração de Documentos está pausado há 5 dias. Taxa de erro acima de 1% em produção.',
+      action: { label: 'Ver detalhes', onClick: () => {} },
+    },
+    {
+      id: '2',
+      type: 'positive' as const,
+      title: 'ROI médio acima da meta',
+      description: `ROI médio de ${avgROI}% supera a meta de 150%. Automação de Atendimento lidera com 320%.`,
+    },
+    {
+      id: '3',
+      type: 'suggestion' as const,
+      title: 'Oportunidade de realocar recursos',
+      description: 'Projeto de Supply Chain pode acelerar se recursos do projeto pausado forem realocados.',
+      action: { label: 'Simular cenário', onClick: () => {} },
+    },
+  ];
 
-    setTimeout(() => {
-      setChatMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant' as const,
-          content: `Análise de risco do projeto **Extração de Documentos**:
+  const filteredInitiatives = initiatives.filter((initiative) => {
+    const matchesSearch = searchTerm === '' ||
+      initiative.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      initiative.owner.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesPhase = filterPhase === null || initiative.phase === filterPhase;
+    const matchesHealth = filterHealth === null || initiative.health === filterHealth;
+    return matchesSearch && matchesPhase && matchesHealth;
+  });
 
-**Problemas identificados:**
-1. Taxa de erro acima de 1% em produção
-2. Falta de dados de treinamento para documentos não estruturados
-3. Dependência de API externa com latência alta
-
-**Recomendações:**
-1. **Pausar deploy** até resolver problemas técnicos
-2. **Investir em dados**: coletar mais exemplos de documentos
-3. **Avaliar alternativas** para API de OCR
-
-**Impacto se pausarmos:**
-- Timeline: +4 semanas
-- Budget: +R$15.000 para melhorias
-
-Deseja que eu agende uma reunião com o time técnico?`,
-        },
-      ]);
-    }, 1500);
-  };
+  const phaseDistribution = Object.entries(phaseConfig).map(([phase]) => ({
+    phase,
+    count: initiatives.filter((i) => i.phase === phase).length,
+  }));
 
   return (
-    <div>
+    <div className="min-h-screen bg-navy-900">
       <Header
         title="Portfolio Dashboard"
         subtitle="Visão consolidada de todas as iniciativas de IA"
       />
 
-      <main className="p-6">
+      <main className="p-6 space-y-6">
+        {/* AI Insights Banner */}
+        <AIInsightBanner insights={insights} onDismiss={() => {}} />
+
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-4 mb-6">
+        <div className="grid gap-4 md:grid-cols-5">
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-muted">Iniciativas Ativas</p>
-                  <p className="text-2xl font-bold text-text">{initiatives.length}</p>
+                  <p className="text-sm text-slate-400">Iniciativas</p>
+                  <p className="text-3xl font-bold text-white">{initiatives.length}</p>
                 </div>
-                <div className="h-10 w-10 rounded-lg bg-aimana-teal/10 flex items-center justify-center">
-                  <Target className="h-5 w-5 text-aimana-teal" />
+                <div className="p-3 rounded-xl bg-teal-500/20">
+                  <Target className="h-6 w-6 text-teal-400" />
                 </div>
               </div>
+              <p className="mt-2 text-sm text-slate-500">
+                {initiatives.filter((i) => i.status === 'active').length} ativas
+              </p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-muted">Investimento Total</p>
-                  <p className="text-2xl font-bold text-text">R${(totalInvestment / 1000).toFixed(0)}k</p>
+                  <p className="text-sm text-slate-400">Investimento</p>
+                  <p className="text-3xl font-bold text-white">R${(totalInvestment / 1000).toFixed(0)}k</p>
                 </div>
-                <div className="h-10 w-10 rounded-lg bg-status-warning-bg flex items-center justify-center">
-                  <DollarSign className="h-5 w-5 text-status-warning" />
+                <div className="p-3 rounded-xl bg-amber-500/20">
+                  <DollarSign className="h-6 w-6 text-amber-400" />
                 </div>
               </div>
+              <p className="mt-2 text-sm text-slate-500">Total alocado</p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-muted">Economia Projetada</p>
-                  <p className="text-2xl font-bold text-status-success">R${(totalSavings / 1000).toFixed(0)}k</p>
+                  <p className="text-sm text-slate-400">Economia</p>
+                  <p className="text-3xl font-bold text-emerald-400">R${(totalSavings / 1000).toFixed(0)}k</p>
                 </div>
-                <div className="h-10 w-10 rounded-lg bg-status-success-bg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-status-success" />
+                <div className="p-3 rounded-xl bg-emerald-500/20">
+                  <TrendingUp className="h-6 w-6 text-emerald-400" />
                 </div>
               </div>
+              <p className="mt-2 text-sm text-slate-500">Projetada/ano</p>
             </CardContent>
           </Card>
+
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-text-muted">ROI Médio</p>
-                  <p className="text-2xl font-bold text-text">{avgROI}%</p>
+                  <p className="text-sm text-slate-400">ROI Médio</p>
+                  <p className="text-3xl font-bold text-blue-400">{avgROI}%</p>
                 </div>
-                <div className="h-10 w-10 rounded-lg bg-phase-manage-bg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-phase-manage" />
+                <div className="p-3 rounded-xl bg-blue-500/20">
+                  <PieChart className="h-6 w-6 text-blue-400" />
                 </div>
               </div>
+              <p className="mt-2 text-sm text-emerald-400">+49% vs meta</p>
+            </CardContent>
+          </Card>
+
+          <Card className={atRiskCount > 0 ? 'border-red-500/30' : ''}>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-slate-400">Em Risco</p>
+                  <p className={cn('text-3xl font-bold', atRiskCount > 0 ? 'text-red-400' : 'text-emerald-400')}>
+                    {atRiskCount}
+                  </p>
+                </div>
+                <div className={cn('p-3 rounded-xl', atRiskCount > 0 ? 'bg-red-500/20' : 'bg-emerald-500/20')}>
+                  <AlertTriangle className={cn('h-6 w-6', atRiskCount > 0 ? 'text-red-400' : 'text-emerald-400')} />
+                </div>
+              </div>
+              <p className="mt-2 text-sm text-slate-500">
+                {atRiskCount > 0 ? 'Requer atenção' : 'Todos saudáveis'}
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        {/* Main Content */}
+        <div className="grid gap-6 lg:grid-cols-4">
+          {/* Sidebar - Filters & Distribution */}
+          <div className="space-y-4">
+            {/* Search */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Buscar iniciativa..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Phase Distribution */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Por Fase</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {phaseDistribution.map(({ phase, count }) => {
+                  const config = phaseConfig[phase as keyof typeof phaseConfig];
+                  const isActive = filterPhase === phase;
+                  return (
+                    <button
+                      key={phase}
+                      onClick={() => setFilterPhase(isActive ? null : phase)}
+                      className={cn(
+                        'w-full flex items-center justify-between p-3 rounded-lg transition-all',
+                        isActive ? 'bg-navy-700 ring-1 ring-teal-500/30' : 'bg-navy-800 hover:bg-navy-700'
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={cn('w-3 h-3 rounded', config.color)} />
+                        <span className={cn('text-sm', isActive ? config.textColor : 'text-slate-300')}>
+                          {phase}
+                        </span>
+                      </div>
+                      <Badge variant="outline" size="sm">{count}</Badge>
+                    </button>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Health Filter */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-base">Por Saúde</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {Object.entries(healthConfig).map(([health, config]) => {
+                  const count = initiatives.filter((i) => i.health === health).length;
+                  const isActive = filterHealth === health;
+                  return (
+                    <button
+                      key={health}
+                      onClick={() => setFilterHealth(isActive ? null : health)}
+                      className={cn(
+                        'w-full flex items-center justify-between p-2 rounded-lg transition-all',
+                        isActive ? config.bgLight : 'hover:bg-navy-800'
+                      )}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={cn('w-2 h-2 rounded-full', config.bg)} />
+                        <span className={cn('text-sm', isActive ? config.color : 'text-slate-400')}>
+                          {config.label}
+                        </span>
+                      </div>
+                      <span className="text-xs text-slate-500">{count}</span>
+                    </button>
+                  );
+                })}
+              </CardContent>
+            </Card>
+
+            {/* Actions */}
+            <div className="space-y-2">
+              <AIActionButton
+                label="Análise do Portfolio"
+                action="analyze"
+                onClick={() => {}}
+                variant="gradient"
+                size="md"
+                className="w-full"
+              />
+              <Button variant="outline" className="w-full">
+                <Download className="h-4 w-4 mr-2" />
+                Exportar Relatório
+              </Button>
+            </div>
+          </div>
+
           {/* Initiatives List */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-3 space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">Iniciativas</h2>
+              <h2 className="text-lg font-semibold text-white">
+                {filteredInitiatives.length} Iniciativas
+                {(filterPhase || filterHealth) && (
+                  <button
+                    onClick={() => { setFilterPhase(null); setFilterHealth(null); }}
+                    className="ml-2 text-sm text-teal-400 hover:underline"
+                  >
+                    Limpar filtros
+                  </button>
+                )}
+              </h2>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm">
-                  <Filter className="h-4 w-4 mr-1" />
-                  Filtrar
-                </Button>
-                <div className="flex rounded-lg border border-surface-border overflow-hidden">
+                <div className="flex rounded-lg border border-navy-700 overflow-hidden">
                   <button
                     className={cn(
-                      'p-2',
-                      viewMode === 'grid' ? 'bg-surface-light' : 'bg-white'
+                      'p-2 transition-colors',
+                      viewMode === 'grid' ? 'bg-navy-700 text-teal-400' : 'text-slate-400 hover:text-white'
                     )}
                     onClick={() => setViewMode('grid')}
                   >
@@ -274,57 +423,77 @@ Deseja que eu agende uma reunião com o time técnico?`,
                   </button>
                   <button
                     className={cn(
-                      'p-2',
-                      viewMode === 'list' ? 'bg-surface-light' : 'bg-white'
+                      'p-2 transition-colors',
+                      viewMode === 'list' ? 'bg-navy-700 text-teal-400' : 'text-slate-400 hover:text-white'
                     )}
                     onClick={() => setViewMode('list')}
                   >
                     <List className="h-4 w-4" />
                   </button>
                 </div>
+                <Button size="sm">
+                  <Plus className="h-4 w-4 mr-1" />
+                  Nova Iniciativa
+                </Button>
               </div>
             </div>
 
             {viewMode === 'grid' ? (
               <div className="grid gap-4 md:grid-cols-2">
-                {initiatives.map((initiative) => {
+                {filteredInitiatives.map((initiative) => {
                   const phase = phaseConfig[initiative.phase as keyof typeof phaseConfig];
                   const health = healthConfig[initiative.health as keyof typeof healthConfig];
+                  const status = statusConfig[initiative.status as keyof typeof statusConfig];
+                  const StatusIcon = status.icon;
                   return (
-                    <Card key={initiative.id} variant="interactive">
-                      <CardContent className="p-4">
+                    <Card key={initiative.id} className="hover:border-teal-500/30 transition-colors">
+                      <CardContent className="p-5">
                         <div className="flex items-start justify-between mb-3">
-                          <Badge variant={phase.badge}>{initiative.phase}</Badge>
-                          <div className={cn('w-2 h-2 rounded-full', health.bg)} title={health.label} />
+                          <div className="flex items-center gap-2">
+                            <Badge variant={phase.badge}>{initiative.phase}</Badge>
+                            <div className={cn('flex items-center gap-1 text-xs', status.color)}>
+                              <StatusIcon className="h-3 w-3" />
+                              {status.label}
+                            </div>
+                          </div>
+                          <div className={cn('flex items-center gap-1.5 px-2 py-1 rounded-full text-xs', health.bgLight, health.color)}>
+                            <div className={cn('w-1.5 h-1.5 rounded-full', health.bg)} />
+                            {health.label}
+                          </div>
                         </div>
-                        <h3 className="font-semibold text-text mb-1">{initiative.name}</h3>
-                        <p className="text-sm text-text-secondary mb-3">{initiative.description}</p>
 
-                        <div className="flex items-center gap-2 mb-3">
+                        <h3 className="font-semibold text-white mb-1">{initiative.name}</h3>
+                        <p className="text-sm text-slate-400 mb-4">{initiative.description}</p>
+
+                        <div className="flex items-center gap-2 mb-4">
                           <Progress value={initiative.progress} size="sm" className="flex-1" />
-                          <span className="text-xs text-text-muted">{initiative.progress}%</span>
+                          <span className="text-sm font-medium text-slate-300">{initiative.progress}%</span>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-xs">
-                          <div className="flex items-center gap-1 text-text-muted">
-                            <DollarSign className="h-3 w-3" />
-                            ROI: <span className="text-status-success font-medium">{initiative.roi}%</span>
+                        <div className="grid grid-cols-2 gap-3 text-sm">
+                          <div className="p-2 bg-navy-800 rounded-lg">
+                            <p className="text-emerald-400 font-semibold">{initiative.roi}%</p>
+                            <p className="text-xs text-slate-500">ROI</p>
                           </div>
-                          <div className="flex items-center gap-1 text-text-muted">
-                            <Calendar className="h-3 w-3" />
-                            {initiative.timeline}
+                          <div className="p-2 bg-navy-800 rounded-lg">
+                            <p className="text-blue-400 font-semibold">R${(initiative.savings / 1000).toFixed(0)}k</p>
+                            <p className="text-xs text-slate-500">Economia</p>
                           </div>
-                          <div className="flex items-center gap-1 text-text-muted">
-                            <Users className="h-3 w-3" />
-                            {initiative.owner}
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-navy-700 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 rounded-full bg-navy-700 flex items-center justify-center">
+                              <Users className="h-3 w-3 text-slate-400" />
+                            </div>
+                            <div>
+                              <p className="text-xs text-slate-300">{initiative.owner}</p>
+                              <p className="text-xs text-slate-500">{initiative.team}</p>
+                            </div>
                           </div>
                           <div className="flex items-center gap-1">
-                            {initiative.health === 'red' ? (
-                              <AlertTriangle className="h-3 w-3 text-status-error" />
-                            ) : (
-                              <CheckCircle2 className="h-3 w-3 text-status-success" />
-                            )}
-                            <span className={health.color}>{health.label}</span>
+                            <Calendar className="h-3 w-3 text-slate-500" />
+                            <span className="text-xs text-slate-500">{initiative.timeline}</span>
                           </div>
                         </div>
                       </CardContent>
@@ -335,153 +504,121 @@ Deseja que eu agende uma reunião com o time técnico?`,
             ) : (
               <Card>
                 <CardContent className="p-0">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-surface-border">
-                        <th className="text-left p-3 text-sm font-medium text-text-muted">Iniciativa</th>
-                        <th className="text-left p-3 text-sm font-medium text-text-muted">Fase</th>
-                        <th className="text-left p-3 text-sm font-medium text-text-muted">Progresso</th>
-                        <th className="text-left p-3 text-sm font-medium text-text-muted">ROI</th>
-                        <th className="text-left p-3 text-sm font-medium text-text-muted">Saúde</th>
-                        <th className="text-left p-3 text-sm font-medium text-text-muted"></th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {initiatives.map((initiative) => {
-                        const phase = phaseConfig[initiative.phase as keyof typeof phaseConfig];
-                        const health = healthConfig[initiative.health as keyof typeof healthConfig];
-                        return (
-                          <tr key={initiative.id} className="border-b border-surface-border last:border-0 hover:bg-surface-light">
-                            <td className="p-3">
-                              <div>
-                                <p className="font-medium text-text">{initiative.name}</p>
-                                <p className="text-xs text-text-muted">{initiative.owner}</p>
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              <Badge variant={phase.badge} size="sm">{initiative.phase}</Badge>
-                            </td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-2">
-                                <Progress value={initiative.progress} size="sm" className="w-20" />
-                                <span className="text-xs text-text-muted">{initiative.progress}%</span>
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              <span className="text-status-success font-medium">{initiative.roi}%</span>
-                            </td>
-                            <td className="p-3">
-                              <div className="flex items-center gap-1">
-                                <div className={cn('w-2 h-2 rounded-full', health.bg)} />
-                                <span className={cn('text-xs', health.color)}>{health.label}</span>
-                              </div>
-                            </td>
-                            <td className="p-3">
-                              <Button variant="ghost" size="sm">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-navy-700">
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Iniciativa</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Fase</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Progresso</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">ROI</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Economia</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Saúde</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400">Owner</th>
+                          <th className="text-left p-4 text-sm font-medium text-slate-400"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredInitiatives.map((initiative) => {
+                          const phase = phaseConfig[initiative.phase as keyof typeof phaseConfig];
+                          const health = healthConfig[initiative.health as keyof typeof healthConfig];
+                          return (
+                            <tr key={initiative.id} className="border-b border-navy-800 last:border-0 hover:bg-navy-800/50 transition-colors">
+                              <td className="p-4">
+                                <div>
+                                  <p className="font-medium text-white">{initiative.name}</p>
+                                  <p className="text-xs text-slate-500">{initiative.description}</p>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <Badge variant={phase.badge} size="sm">{initiative.phase}</Badge>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-2">
+                                  <Progress value={initiative.progress} size="sm" className="w-20" />
+                                  <span className="text-xs text-slate-400">{initiative.progress}%</span>
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <span className="text-emerald-400 font-medium">{initiative.roi}%</span>
+                              </td>
+                              <td className="p-4">
+                                <span className="text-slate-300">R${(initiative.savings / 1000).toFixed(0)}k</span>
+                              </td>
+                              <td className="p-4">
+                                <div className={cn('flex items-center gap-1.5 px-2 py-1 rounded-full text-xs w-fit', health.bgLight, health.color)}>
+                                  <div className={cn('w-1.5 h-1.5 rounded-full', health.bg)} />
+                                  {health.label}
+                                </div>
+                              </td>
+                              <td className="p-4">
+                                <p className="text-sm text-slate-300">{initiative.owner}</p>
+                              </td>
+                              <td className="p-4">
+                                <div className="flex items-center gap-1">
+                                  <Button variant="ghost" size="sm">
+                                    <Eye className="h-4 w-4" />
+                                  </Button>
+                                  <Button variant="ghost" size="sm">
+                                    <MoreVertical className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 </CardContent>
               </Card>
             )}
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Agent Chat */}
-            <Card>
-              <CardHeader className="border-b border-surface-border">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-aimana-teal">
-                    <Bot className="h-5 w-5 text-aimana-navy" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-base">PortfolioAgent</CardTitle>
-                    <CardDescription>Análise de portfólio</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="h-64 overflow-y-auto p-4 space-y-3 scrollbar-thin">
-                  {chatMessages.map((msg, i) => (
-                    <div
-                      key={i}
-                      className={cn(
-                        'rounded-lg px-3 py-2 text-sm',
-                        msg.role === 'user'
-                          ? 'bg-aimana-navy text-white ml-8'
-                          : 'bg-surface-light text-text mr-4'
-                      )}
-                    >
-                      <p className="whitespace-pre-wrap">{msg.content}</p>
+            {/* At Risk Section */}
+            {initiatives.filter((i) => i.health === 'red').length > 0 && (
+              <Card className="border-red-500/30">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-5 w-5 text-red-400" />
+                      <CardTitle className="text-base">Projetos em Risco</CardTitle>
                     </div>
-                  ))}
-                </div>
-                <div className="border-t border-surface-border p-3">
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Pergunte sobre o portfólio..."
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleChatSend()}
-                      inputSize="sm"
+                    <AIActionButton
+                      label="Diagnóstico IA"
+                      action="diagnose"
+                      onClick={() => {}}
+                      variant="outline"
+                      size="sm"
                     />
-                    <Button size="sm" onClick={handleChatSend}>
-                      <Send className="h-4 w-4" />
-                    </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* By Phase */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Por Fase</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {Object.entries(phaseConfig).map(([phase, config]) => {
-                  const count = initiatives.filter((i) => i.phase === phase).length;
-                  return (
-                    <div key={phase} className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className={cn('w-3 h-3 rounded', config.color)} />
-                        <span className="text-sm text-text">{phase}</span>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {initiatives.filter((i) => i.health === 'red').map((initiative) => (
+                      <div key={initiative.id} className="flex items-center justify-between p-4 rounded-xl bg-red-500/10 border border-red-500/20">
+                        <div className="flex items-center gap-4">
+                          <div className="p-2 bg-red-500/20 rounded-lg">
+                            <AlertTriangle className="h-5 w-5 text-red-400" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-white">{initiative.name}</p>
+                            <p className="text-sm text-slate-400">
+                              {initiative.status === 'paused' ? 'Pausado' : 'Atrasado'} • Última atualização: {initiative.lastUpdate}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button variant="outline" size="sm">
+                            Ver Detalhes
+                            <ChevronRight className="h-4 w-4 ml-1" />
+                          </Button>
+                        </div>
                       </div>
-                      <Badge variant="outline">{count}</Badge>
-                    </div>
-                  );
-                })}
-              </CardContent>
-            </Card>
-
-            {/* At Risk */}
-            <Card className="border-status-error/30">
-              <CardHeader>
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="h-4 w-4 text-status-error" />
-                  <CardTitle className="text-base">Em Risco</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {initiatives.filter((i) => i.health === 'red').map((initiative) => (
-                  <div key={initiative.id} className="flex items-center justify-between p-2 rounded-lg bg-status-error-bg">
-                    <div>
-                      <p className="text-sm font-medium text-text">{initiative.name}</p>
-                      <p className="text-xs text-text-muted">{initiative.status === 'paused' ? 'Pausado' : 'Atrasado'}</p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      <ArrowRight className="h-4 w-4" />
-                    </Button>
+                    ))}
                   </div>
-                ))}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
