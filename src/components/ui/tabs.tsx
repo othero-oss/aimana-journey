@@ -1,6 +1,10 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
+// ============================================================================
+// Types
+// ============================================================================
+
 interface Tab {
   id: string;
   label: string;
@@ -8,22 +12,69 @@ interface Tab {
   badge?: string | number;
 }
 
-interface TabsProps {
-  tabs: Tab[];
+interface TabsContextType {
   activeTab: string;
-  onTabChange: (id: string) => void;
+  setActiveTab: (value: string) => void;
+}
+
+// ============================================================================
+// Context
+// ============================================================================
+
+const TabsContext = React.createContext<TabsContextType | null>(null);
+
+export function useTabsContext() {
+  const context = React.useContext(TabsContext);
+  if (!context) {
+    throw new Error('Tabs components must be used within a Tabs');
+  }
+  return context;
+}
+
+// ============================================================================
+// Main Tabs Component (supports both compound and declarative APIs)
+// ============================================================================
+
+interface TabsProps {
+  // Declarative API props
+  tabs?: Tab[];
+  activeTab?: string;
+  onTabChange?: (id: string) => void;
+  // Compound API props
+  value?: string;
+  onValueChange?: (value: string) => void;
+  children?: React.ReactNode;
+  // Common props
   className?: string;
   variant?: 'default' | 'pills' | 'underline';
 }
 
-interface TabsContentProps {
-  value: string;
-  activeTab: string;
-  children: React.ReactNode;
-  className?: string;
-}
+export function Tabs({
+  tabs,
+  activeTab,
+  onTabChange,
+  value,
+  onValueChange,
+  children,
+  className,
+  variant = 'default'
+}: TabsProps) {
+  // Support both APIs - compound (children) and declarative (tabs array)
+  const effectiveActiveTab = value || activeTab || '';
+  const effectiveOnChange = onValueChange || onTabChange || (() => {});
 
-export function Tabs({ tabs, activeTab, onTabChange, className, variant = 'default' }: TabsProps) {
+  // If using compound API (children), wrap with context
+  if (children) {
+    return (
+      <TabsContext.Provider value={{ activeTab: effectiveActiveTab, setActiveTab: effectiveOnChange }}>
+        <div className={className}>
+          {children}
+        </div>
+      </TabsContext.Provider>
+    );
+  }
+
+  // Original declarative API
   const baseStyles = 'flex gap-1';
 
   const tabBaseStyles = 'flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-lg';
@@ -56,13 +107,13 @@ export function Tabs({ tabs, activeTab, onTabChange, className, variant = 'defau
 
   return (
     <div className={cn(baseStyles, currentVariant.container, className)}>
-      {tabs.map((tab) => (
+      {tabs?.map((tab) => (
         <button
           key={tab.id}
-          onClick={() => onTabChange(tab.id)}
+          onClick={() => effectiveOnChange(tab.id)}
           className={cn(
             tabBaseStyles,
-            activeTab === tab.id ? currentVariant.tab.active : currentVariant.tab.inactive
+            effectiveActiveTab === tab.id ? currentVariant.tab.active : currentVariant.tab.inactive
           )}
         >
           {tab.icon}
@@ -70,7 +121,7 @@ export function Tabs({ tabs, activeTab, onTabChange, className, variant = 'defau
           {tab.badge !== undefined && (
             <span className={cn(
               'ml-1 px-2 py-0.5 text-xs rounded-full',
-              activeTab === tab.id
+              effectiveActiveTab === tab.id
                 ? 'bg-white/20 text-white'
                 : 'bg-navy-700 text-slate-400'
             )}>
@@ -83,60 +134,9 @@ export function Tabs({ tabs, activeTab, onTabChange, className, variant = 'defau
   );
 }
 
-export function TabsContent({ value, activeTab, children, className }: TabsContentProps) {
-  if (value !== activeTab) return null;
-
-  return (
-    <div className={cn('animate-in fade-in-50 duration-200', className)}>
-      {children}
-    </div>
-  );
-}
-
-// Compound component for more flexible usage
-interface TabsRootProps {
-  defaultValue?: string;
-  value?: string;
-  onValueChange?: (value: string) => void;
-  children: React.ReactNode;
-  className?: string;
-}
-
-interface TabsContextType {
-  activeTab: string;
-  setActiveTab: (value: string) => void;
-}
-
-const TabsContext = React.createContext<TabsContextType | null>(null);
-
-export function TabsRoot({ defaultValue, value, onValueChange, children, className }: TabsRootProps) {
-  const [internalValue, setInternalValue] = React.useState(defaultValue || '');
-
-  const activeTab = value !== undefined ? value : internalValue;
-
-  const setActiveTab = React.useCallback((newValue: string) => {
-    if (value === undefined) {
-      setInternalValue(newValue);
-    }
-    onValueChange?.(newValue);
-  }, [value, onValueChange]);
-
-  return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
-      <div className={className}>
-        {children}
-      </div>
-    </TabsContext.Provider>
-  );
-}
-
-export function useTabsContext() {
-  const context = React.useContext(TabsContext);
-  if (!context) {
-    throw new Error('Tabs components must be used within a TabsRoot');
-  }
-  return context;
-}
+// ============================================================================
+// Compound Components
+// ============================================================================
 
 interface TabsListProps {
   children: React.ReactNode;
@@ -198,16 +198,19 @@ export function TabsTrigger({ value, children, className, icon, badge, disabled 
   );
 }
 
-interface TabsContentCompoundProps {
+interface TabsContentProps {
   value: string;
+  activeTab?: string;
   children: React.ReactNode;
   className?: string;
 }
 
-export function TabsContentCompound({ value, children, className }: TabsContentCompoundProps) {
-  const { activeTab } = useTabsContext();
+export function TabsContent({ value, activeTab, children, className }: TabsContentProps) {
+  // If activeTab is not provided, try to get it from context
+  const context = React.useContext(TabsContext);
+  const effectiveActiveTab = activeTab || context?.activeTab || '';
 
-  if (value !== activeTab) return null;
+  if (value !== effectiveActiveTab) return null;
 
   return (
     <div className={cn('animate-in fade-in-50 duration-200', className)}>
@@ -215,3 +218,10 @@ export function TabsContentCompound({ value, children, className }: TabsContentC
     </div>
   );
 }
+
+// ============================================================================
+// Legacy exports for backward compatibility
+// ============================================================================
+
+export { Tabs as TabsRoot };
+export { TabsContent as TabsContentCompound };

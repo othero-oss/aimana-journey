@@ -28,6 +28,7 @@ interface AIModalProps {
   agentName?: string;
   agentDescription?: string;
   initialMessage?: string;
+  initialPrompt?: string;
   suggestedPrompts?: string[];
   context?: Record<string, unknown>;
   onSendMessage?: (message: string) => Promise<string>;
@@ -42,13 +43,16 @@ export function AIModal({
   agentName = 'Assistente IA',
   agentDescription,
   initialMessage,
+  initialPrompt,
   suggestedPrompts = [],
   context,
   onSendMessage,
   className
 }: AIModalProps) {
+  // Use initialPrompt as initialMessage if provided
+  const effectiveInitialMessage = initialMessage || initialPrompt;
   const [messages, setMessages] = React.useState<Message[]>(() =>
-    initialMessage ? [{ role: 'assistant', content: initialMessage }] : []
+    effectiveInitialMessage ? [{ role: 'assistant', content: effectiveInitialMessage }] : []
   );
   const [input, setInput] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -65,10 +69,10 @@ export function AIModal({
   }, [messages]);
 
   React.useEffect(() => {
-    if (isOpen && initialMessage && messages.length === 0) {
-      setMessages([{ role: 'assistant', content: initialMessage }]);
+    if (isOpen && effectiveInitialMessage && messages.length === 0) {
+      setMessages([{ role: 'assistant', content: effectiveInitialMessage }]);
     }
-  }, [isOpen, initialMessage]);
+  }, [isOpen, effectiveInitialMessage]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;

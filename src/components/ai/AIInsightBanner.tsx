@@ -23,9 +23,11 @@ interface Insight {
 }
 
 interface AIInsightBannerProps {
-  insights: Insight[];
+  title?: string;
+  insights: (Insight | string)[];
   onDismiss?: (id: string) => void;
   onDismissAll?: () => void;
+  onAnalyze?: () => void;
   className?: string;
   collapsed?: boolean;
   onToggleCollapse?: () => void;
@@ -63,14 +65,29 @@ const insightConfig = {
 };
 
 export function AIInsightBanner({
+  title = 'Insights da IA',
   insights,
   onDismiss,
   onDismissAll,
+  onAnalyze,
   className,
   collapsed = false,
   onToggleCollapse
 }: AIInsightBannerProps) {
   if (insights.length === 0) return null;
+
+  // Normalize insights to always be Insight objects
+  const normalizedInsights: Insight[] = insights.map((insight, index) => {
+    if (typeof insight === 'string') {
+      return {
+        id: `insight-${index}`,
+        type: 'info' as const,
+        title: insight,
+        description: ''
+      };
+    }
+    return insight;
+  });
 
   if (collapsed) {
     return (
@@ -88,7 +105,7 @@ export function AIInsightBanner({
             <Sparkles className="h-4 w-4 text-teal-400" />
           </div>
           <span className="text-sm font-medium text-slate-300">
-            {insights.length} insight{insights.length > 1 ? 's' : ''} da IA disponível{insights.length > 1 ? 'eis' : ''}
+            {normalizedInsights.length} insight{normalizedInsights.length > 1 ? 's' : ''} da IA disponível{normalizedInsights.length > 1 ? 'eis' : ''}
           </span>
         </div>
         <ChevronRight className="h-4 w-4 text-slate-400" />
@@ -104,9 +121,20 @@ export function AIInsightBanner({
           <div className="p-1.5 bg-gradient-to-br from-teal-500/20 to-purple-500/20 rounded-lg">
             <Sparkles className="h-4 w-4 text-teal-400" />
           </div>
-          <span className="text-sm font-semibold text-slate-200">Insights da IA</span>
+          <span className="text-sm font-semibold text-slate-200">{title}</span>
         </div>
         <div className="flex items-center gap-2">
+          {onAnalyze && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onAnalyze}
+              className="text-teal-400 hover:text-white h-7 px-2"
+            >
+              <Sparkles className="h-3 w-3 mr-1" />
+              Analisar
+            </Button>
+          )}
           {onToggleCollapse && (
             <Button
               variant="ghost"
@@ -117,7 +145,7 @@ export function AIInsightBanner({
               Minimizar
             </Button>
           )}
-          {onDismissAll && insights.length > 1 && (
+          {onDismissAll && normalizedInsights.length > 1 && (
             <Button
               variant="ghost"
               size="sm"
@@ -132,7 +160,7 @@ export function AIInsightBanner({
 
       {/* Insights */}
       <div className="grid gap-2">
-        {insights.map((insight) => {
+        {normalizedInsights.map((insight) => {
           const config = insightConfig[insight.type];
           const Icon = config.icon;
 

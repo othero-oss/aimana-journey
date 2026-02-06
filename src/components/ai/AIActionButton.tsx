@@ -15,7 +15,8 @@ type AIActionType = 'generate' | 'analyze' | 'suggest' | 'diagnose' | 'summarize
 
 interface AIActionButtonProps {
   label: string;
-  action: AIActionType;
+  action?: AIActionType;
+  icon?: React.ReactNode;
   onClick: () => void;
   isLoading?: boolean;
   disabled?: boolean;
@@ -36,7 +37,8 @@ const actionConfig: Record<AIActionType, { icon: React.ElementType; defaultLabel
 
 export function AIActionButton({
   label,
-  action,
+  action = 'generate',
+  icon,
   onClick,
   isLoading = false,
   disabled = false,
@@ -46,7 +48,8 @@ export function AIActionButton({
   loadingText = 'Processando...'
 }: AIActionButtonProps) {
   const config = actionConfig[action];
-  const Icon = config.icon;
+  const DefaultIcon = config.icon;
+  const IconToRender = icon ? () => icon : DefaultIcon;
 
   const sizeStyles = {
     sm: 'h-8 px-3 text-xs',
@@ -83,7 +86,7 @@ export function AIActionButton({
           </>
         ) : (
           <>
-            <Icon className={iconSizes[size]} />
+            {icon ? <span className={iconSizes[size]}>{icon}</span> : <DefaultIcon className={iconSizes[size]} />}
             <span>{label}</span>
           </>
         )}
@@ -117,7 +120,7 @@ export function AIActionButton({
         </>
       ) : (
         <>
-          <Icon className={iconSizes[size]} />
+          {icon ? <span className={iconSizes[size]}>{icon}</span> : <DefaultIcon className={iconSizes[size]} />}
           <span>{label}</span>
         </>
       )}
