@@ -201,6 +201,7 @@ export function AIStrategy() {
     { id: 'vision', label: 'Visão & Roadmap', icon: <Target className="h-4 w-4" /> },
     { id: 'inputs', label: 'Inputs Liderança', icon: <Users className="h-4 w-4" />, badge: `${completedInputs}/${leadershipInputs.length}` },
     { id: 'workshop', label: 'Prep. Workshop', icon: <Calendar className="h-4 w-4" /> },
+    { id: 'apply', label: 'Aplicar Workshop', icon: <Play className="h-4 w-4" /> },
   ];
 
   const handleAIMessage = async (message: string): Promise<string> => {
@@ -230,14 +231,6 @@ Usar o workshop para alinhar timeline e definir abordagem híbrida (quick wins i
       />
 
       <main className="p-6 space-y-6">
-        {/* AI Insights Banner */}
-        {visibleInsights.length > 0 && (
-          <AIInsightBanner
-            insights={visibleInsights}
-            onDismiss={(id) => setInsightsDismissed((prev) => [...prev, id])}
-          />
-        )}
-
         {/* Tabs */}
         <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -863,6 +856,263 @@ Usar o workshop para alinhar timeline e definir abordagem híbrida (quick wins i
                   </ul>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Tab: Aplicar Workshop */}
+        <TabsContent value="apply" activeTab={activeTab}>
+          <div className="grid gap-6 lg:grid-cols-3">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Info Banner */}
+              <Card className="bg-gradient-to-r from-aimana-teal/10 to-phase-plan/10 border-aimana-teal/30">
+                <CardContent className="p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-full bg-aimana-teal/20">
+                      <Play className="h-6 w-6 text-aimana-teal" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-text mb-1">Durante ou após o Workshop</h3>
+                      <p className="text-sm text-text-secondary">
+                        Use esta aba para registrar decisões em tempo real, votar em iniciativas e capturar ações.
+                        As informações aqui serão consolidadas automaticamente no Documento de Visão.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Decisions Capture */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-status-success" />
+                        Decisões Registradas
+                      </CardTitle>
+                      <CardDescription>Capture as decisões tomadas durante o workshop</CardDescription>
+                    </div>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Nova Decisão
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { id: 1, decision: 'Priorizar eficiência operacional como foco principal de 2025', votes: 4, status: 'approved', area: 'Estratégia' },
+                      { id: 2, decision: 'Começar com 2 pilotos: Customer Support e Análise Financeira', votes: 4, status: 'approved', area: 'Roadmap' },
+                      { id: 3, decision: 'Adotar abordagem híbrida: quick wins com parceiros + capacidades internas', votes: 3, status: 'approved', area: 'Execução' },
+                    ].map((item) => (
+                      <div key={item.id} className="p-4 rounded-lg bg-status-success-bg border border-status-success/20">
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-5 w-5 text-status-success" />
+                            <Badge variant="success" size="sm">{item.area}</Badge>
+                          </div>
+                          <Badge variant="outline" size="sm">{item.votes} votos</Badge>
+                        </div>
+                        <p className="text-text font-medium">{item.decision}</p>
+                      </div>
+                    ))}
+
+                    {/* Pending Decision */}
+                    <div className="p-4 rounded-lg bg-status-warning-bg border border-status-warning/20">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="h-5 w-5 text-status-warning" />
+                          <Badge variant="warning" size="sm">Governança</Badge>
+                        </div>
+                        <Badge variant="outline" size="sm">Em votação</Badge>
+                      </div>
+                      <p className="text-text font-medium mb-3">Timeline para implementação de políticas de IA</p>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm">3 meses (CFO)</Button>
+                        <Button variant="outline" size="sm">6 meses (CTO)</Button>
+                        <Button variant="outline" size="sm">Híbrido</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Priority Voting */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5 text-phase-plan" />
+                        Priorização de Iniciativas
+                      </CardTitle>
+                      <CardDescription>Vote nas iniciativas para definir prioridades</CardDescription>
+                    </div>
+                    <AIActionButton
+                      label="Sugerir Priorização"
+                      action="suggest"
+                      onClick={() => setShowWorkshopModal(true)}
+                      variant="outline"
+                      size="sm"
+                    />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { id: 1, name: 'Automação de Atendimento', votes: 4, priority: 1, track: 'Champion-built' },
+                      { id: 2, name: 'Análise Financeira Automatizada', votes: 3, priority: 2, track: 'Ready-made' },
+                      { id: 3, name: 'Previsão de Demanda', votes: 2, priority: 3, track: 'Coder-built' },
+                      { id: 4, name: 'Assistente de RH', votes: 1, priority: 4, track: 'Ready-made' },
+                    ].map((item) => (
+                      <div key={item.id} className="flex items-center gap-4 p-3 rounded-lg bg-surface-light">
+                        <div className="w-8 h-8 rounded-full bg-aimana-navy text-white flex items-center justify-center font-bold">
+                          {item.priority}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-text">{item.name}</p>
+                          <Badge variant="outline" size="sm">{item.track}</Badge>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-text-muted">{item.votes} votos</span>
+                          <Progress value={item.votes * 25} size="sm" className="w-20" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Items */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="flex items-center gap-2">
+                        <Flag className="h-5 w-5 text-status-warning" />
+                        Ações e Responsáveis
+                      </CardTitle>
+                      <CardDescription>Próximos passos definidos no workshop</CardDescription>
+                    </div>
+                    <Button size="sm">
+                      <Plus className="h-4 w-4 mr-1" />
+                      Nova Ação
+                    </Button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {[
+                      { id: 1, action: 'Detalhar business case para piloto de Atendimento', owner: 'Maria Santos (CFO)', deadline: '15/02', status: 'pending' },
+                      { id: 2, action: 'Mapear integrações necessárias com sistemas existentes', owner: 'Ana Costa (CTO)', deadline: '20/02', status: 'pending' },
+                      { id: 3, action: 'Apresentar políticas de IA para aprovação do board', owner: 'Roberto Silva (CEO)', deadline: '28/02', status: 'pending' },
+                      { id: 4, action: 'Identificar AI Champions em cada área', owner: 'Carlos Lima (COO)', deadline: '10/02', status: 'in_progress' },
+                    ].map((item) => (
+                      <div key={item.id} className="flex items-center gap-4 p-3 rounded-lg border border-surface-border">
+                        <div className={cn(
+                          'w-2 h-2 rounded-full',
+                          item.status === 'in_progress' ? 'bg-status-warning' : 'bg-text-muted'
+                        )} />
+                        <div className="flex-1">
+                          <p className="text-sm text-text">{item.action}</p>
+                          <p className="text-xs text-text-muted">{item.owner}</p>
+                        </div>
+                        <Badge variant={item.status === 'in_progress' ? 'warning' : 'outline'} size="sm">
+                          {item.deadline}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Consolidate to Document */}
+              <Card className="bg-gradient-header text-white">
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-2 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Consolidar no Documento
+                  </h3>
+                  <p className="text-sm text-white/80 mb-4">
+                    Gere automaticamente o Documento de Visão AI-First com base nas decisões e ações registradas.
+                  </p>
+                  <Button
+                    variant="outline"
+                    className="w-full border-white/30 text-white hover:bg-white/10"
+                    onClick={() => setShowDocumentModal(true)}
+                  >
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Gerar Documento
+                  </Button>
+                </CardContent>
+              </Card>
+
+              {/* Workshop Summary */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base">Resumo do Workshop</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 bg-status-success-bg rounded-lg">
+                      <p className="text-2xl font-bold text-status-success">3</p>
+                      <p className="text-xs text-text-muted">Decisões aprovadas</p>
+                    </div>
+                    <div className="text-center p-3 bg-status-warning-bg rounded-lg">
+                      <p className="text-2xl font-bold text-status-warning">1</p>
+                      <p className="text-xs text-text-muted">Em votação</p>
+                    </div>
+                    <div className="text-center p-3 bg-surface-light rounded-lg">
+                      <p className="text-2xl font-bold text-phase-execute">4</p>
+                      <p className="text-xs text-text-muted">Ações definidas</p>
+                    </div>
+                    <div className="text-center p-3 bg-surface-light rounded-lg">
+                      <p className="text-2xl font-bold text-text">4</p>
+                      <p className="text-xs text-text-muted">Iniciativas priorizadas</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Participants */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Users className="h-4 w-4 text-text-muted" />
+                    Participantes
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {leadershipInputs.map((input) => (
+                    <div key={input.id} className="flex items-center gap-3 p-2 rounded-lg bg-surface-light">
+                      <div className="h-8 w-8 rounded-full bg-aimana-navy text-white flex items-center justify-center text-xs font-medium">
+                        {input.avatar}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-text truncate">{input.leader.split(' - ')[1]}</p>
+                        <p className="text-xs text-text-muted">{input.leader.split(' - ')[0]}</p>
+                      </div>
+                      <div className="w-2 h-2 rounded-full bg-status-success" title="Online" />
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+
+              {/* Export */}
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1" size="sm">
+                  <Download className="h-4 w-4 mr-1" />
+                  Exportar Ata
+                </Button>
+                <Button variant="outline" className="flex-1" size="sm">
+                  <Send className="h-4 w-4 mr-1" />
+                  Enviar Resumo
+                </Button>
+              </div>
             </div>
           </div>
         </TabsContent>

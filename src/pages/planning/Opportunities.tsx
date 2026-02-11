@@ -26,6 +26,7 @@ import {
   TrendingUp,
   Clock,
   Users,
+  User,
   Zap,
   Filter,
   Plus,
@@ -63,6 +64,10 @@ const opportunities = [
     score: 92,
     aiExposure: 78,
     hoursPerMonth: 120,
+    // Classificação por tipo de exposição à IA
+    automation: 85, // % que pode ser totalmente automatizado
+    augmentation: 10, // % que IA assiste o humano
+    human: 5, // % que permanece humano
     tasks: [
       { name: 'Leitura de e-mails', classification: 'Automação', aiReady: true },
       { name: 'Classificação', classification: 'Automação', aiReady: true },
@@ -82,6 +87,9 @@ const opportunities = [
     score: 85,
     aiExposure: 65,
     hoursPerMonth: 80,
+    automation: 60,
+    augmentation: 30,
+    human: 10,
     tasks: [
       { name: 'Coleta de dados', classification: 'Automação', aiReady: true },
       { name: 'Análise de variações', classification: 'Aumento', aiReady: true },
@@ -102,6 +110,9 @@ const opportunities = [
     score: 78,
     aiExposure: 72,
     hoursPerMonth: 200,
+    automation: 50,
+    augmentation: 35,
+    human: 15,
     tasks: [
       { name: 'Responder FAQs', classification: 'Automação', aiReady: true },
       { name: 'Escalar tickets', classification: 'Aumento', aiReady: true },
@@ -121,6 +132,9 @@ const opportunities = [
     score: 72,
     aiExposure: 58,
     hoursPerMonth: 40,
+    automation: 30,
+    augmentation: 45,
+    human: 25,
     tasks: [
       { name: 'Leitura de PDFs', classification: 'Automação', aiReady: true },
       { name: 'Extração de cláusulas', classification: 'Aumento', aiReady: true },
@@ -141,6 +155,9 @@ const opportunities = [
     score: 68,
     aiExposure: 45,
     hoursPerMonth: 60,
+    automation: 35,
+    augmentation: 40,
+    human: 25,
     tasks: [
       { name: 'Análise histórica', classification: 'Aumento', aiReady: true },
       { name: 'Modelagem preditiva', classification: 'Automação', aiReady: true },
@@ -307,8 +324,6 @@ Deseja que eu detalhe alguma oportunidade ou continue a análise com mais cargos
         {/* Map Tab */}
         <TabsContent value="map" activeTab={activeTab}>
           <div className="space-y-6">
-            {/* AI Insights Banner */}
-            <AIInsightBanner insights={insights} onDismiss={() => {}} />
 
             {/* Stats */}
             <div className="grid gap-4 md:grid-cols-4">
@@ -575,6 +590,47 @@ Deseja que eu detalhe alguma oportunidade ou continue a análise com mais cargos
                           </div>
                         </div>
 
+                        {/* Classificação de Exposição: Automação / Augmentação / Humano */}
+                        <div className="mt-3 p-3 bg-navy-800/50 rounded-lg">
+                          <div className="flex items-center justify-between text-xs mb-2">
+                            <span className="text-slate-500">Classificação de Exposição à IA</span>
+                          </div>
+                          <div className="flex h-2 rounded-full overflow-hidden mb-2">
+                            <div
+                              className="bg-emerald-500"
+                              style={{ width: `${opp.automation}%` }}
+                              title={`Automação: ${opp.automation}%`}
+                            />
+                            <div
+                              className="bg-blue-500"
+                              style={{ width: `${opp.augmentation}%` }}
+                              title={`Augmentação: ${opp.augmentation}%`}
+                            />
+                            <div
+                              className="bg-slate-500"
+                              style={{ width: `${opp.human}%` }}
+                              title={`Humano: ${opp.human}%`}
+                            />
+                          </div>
+                          <div className="flex justify-between text-xs">
+                            <span className="flex items-center gap-1">
+                              <Bot className="h-3 w-3 text-emerald-400" />
+                              <span className="text-emerald-400">{opp.automation}%</span>
+                              <span className="text-slate-500">Auto</span>
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Brain className="h-3 w-3 text-blue-400" />
+                              <span className="text-blue-400">{opp.augmentation}%</span>
+                              <span className="text-slate-500">Aug</span>
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3 text-slate-400" />
+                              <span className="text-slate-400">{opp.human}%</span>
+                              <span className="text-slate-500">Humano</span>
+                            </span>
+                          </div>
+                        </div>
+
                         <div className="mt-3 pt-3 border-t border-navy-700">
                           <div className="flex items-center justify-between mb-2">
                             <p className="text-xs text-slate-500">Tarefas ({opp.tasks.length})</p>
@@ -607,6 +663,9 @@ Deseja que eu detalhe alguma oportunidade ou continue a análise com mais cargos
                 </div>
               </div>
             </div>
+
+            {/* AI Insights Banner - No final da aba de mapa */}
+            <AIInsightBanner insights={insights} onDismiss={() => {}} />
           </div>
         </TabsContent>
 

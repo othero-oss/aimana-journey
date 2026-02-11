@@ -503,18 +503,6 @@ export function Governance() {
       />
 
       <main className="p-6">
-        {/* AI Insight Banner */}
-        <AIInsightBanner
-          title="Análise de Governança"
-          insights={[
-            `${completedItems} de ${totalItems} controles implementados (${Math.round((completedItems/totalItems)*100)}%)`,
-            `${criticalPending} controles críticos pendentes precisam de atenção`,
-            `${riskItems.filter(r => r.severity === 'critical').length} riscos críticos identificados`,
-          ]}
-          onAnalyze={() => openAIModal('Análise Completa de Governança', 'governance-full')}
-          className="mb-6"
-        />
-
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
@@ -986,6 +974,18 @@ export function Governance() {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* AI Insight Banner - No final da página */}
+        <AIInsightBanner
+          title="Análise de Governança"
+          insights={[
+            `${completedItems} de ${totalItems} controles implementados (${Math.round((completedItems/totalItems)*100)}%)`,
+            `${criticalPending} controles críticos pendentes precisam de atenção`,
+            `${riskItems.filter(r => r.severity === 'critical').length} riscos críticos identificados`,
+          ]}
+          onAnalyze={() => openAIModal('Análise Completa de Governança', 'governance-full')}
+          className="mt-6"
+        />
       </main>
 
       {/* AI Modal */}

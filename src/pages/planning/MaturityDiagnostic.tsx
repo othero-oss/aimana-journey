@@ -168,60 +168,76 @@ const getScoreLabel = (score: number) => {
   return 'Inicial';
 };
 
-// Diagnostic questions by dimension
+// Diagnostic questions by dimension - Baseado em frameworks Gartner, Microsoft RAI, MITRE, Google, Accenture
+// Escala: Inexistente (0) | Inicial (1) | Definido (2) | Gerenciado (3) | Otimizado (4)
 const diagnosticQuestions = [
   {
     dimension: 'strategy',
     dimensionName: 'Estratégia & Visão',
+    icon: Target,
     questions: [
-      { id: 'q1', text: 'A empresa possui uma visão documentada de IA?', options: ['Não', 'Em elaboração', 'Sim, parcial', 'Sim, completa'] },
-      { id: 'q2', text: 'Existe um roadmap de IA alinhado ao plano estratégico?', options: ['Não', 'Em elaboração', 'Sim, parcial', 'Sim, completo'] },
-      { id: 'q3', text: 'A liderança está engajada com as iniciativas de IA?', options: ['Não', 'Pouco', 'Moderadamente', 'Muito'] },
+      { id: 'q1', text: 'A organização possui uma visão formal de IA documentada e comunicada?', options: ['Inexistente', 'Inicial', 'Definida', 'Gerenciada', 'Otimizada'], help: 'Considere se existe um documento formal, se foi aprovado pela liderança e se é comunicado regularmente.' },
+      { id: 'q2', text: 'Existem KPIs definidos para medir o sucesso das iniciativas de IA?', options: ['Inexistente', 'Inicial', 'Definidos', 'Gerenciados', 'Otimizados'], help: 'Avalie se há métricas claras de ROI, adoção, qualidade e impacto no negócio.' },
+      { id: 'q3', text: 'A liderança executiva patrocina e prioriza ativamente iniciativas de IA?', options: ['Não patrocina', 'Interesse superficial', 'Apoio moderado', 'Patrocínio ativo', 'Liderança AI-First'], help: 'Considere o envolvimento do C-level em decisões e comunicações sobre IA.' },
+      { id: 'q4', text: 'Há orçamento dedicado para projetos de IA?', options: ['Não há', 'Ad-hoc', 'Parcial', 'Dedicado', 'Estratégico'], help: 'Avalie se há alocação formal de recursos financeiros para IA.' },
     ],
   },
   {
     dimension: 'data',
     dimensionName: 'Dados & Infraestrutura',
+    icon: Database,
     questions: [
-      { id: 'q4', text: 'Os dados estão catalogados e documentados?', options: ['Não', 'Parcialmente', 'Maioria', 'Completamente'] },
-      { id: 'q5', text: 'Existe governança de dados estabelecida?', options: ['Não', 'Iniciando', 'Parcial', 'Completa'] },
-      { id: 'q6', text: 'A qualidade dos dados é monitorada?', options: ['Não', 'Ad-hoc', 'Parcialmente', 'Continuamente'] },
-    ],
-  },
-  {
-    dimension: 'talent',
-    dimensionName: 'Talentos & Skills',
-    questions: [
-      { id: 'q7', text: 'A empresa possui profissionais com skills de IA?', options: ['Não', 'Poucos', 'Time dedicado', 'Múltiplos times'] },
-      { id: 'q8', text: 'Existe programa de capacitação em IA?', options: ['Não', 'Planejando', 'Piloto', 'Implementado'] },
-      { id: 'q9', text: 'A cultura de experimentação é incentivada?', options: ['Não', 'Pouco', 'Moderadamente', 'Muito'] },
-    ],
-  },
-  {
-    dimension: 'governance',
-    dimensionName: 'Governança & Ética',
-    questions: [
-      { id: 'q10', text: 'Existem políticas de uso responsável de IA?', options: ['Não', 'Em elaboração', 'Parciais', 'Completas'] },
-      { id: 'q11', text: 'Há comitê ou fórum de governança de IA?', options: ['Não', 'Planejando', 'Informal', 'Formal'] },
-      { id: 'q12', text: 'Os riscos de IA são avaliados sistematicamente?', options: ['Não', 'Ad-hoc', 'Parcialmente', 'Sempre'] },
+      { id: 'q5', text: 'Qual o nível de maturidade do seu data warehouse/lake?', options: ['Inexistente', 'Básico', 'Estruturado', 'Integrado', 'Avançado'], help: 'Considere centralização, qualidade, atualização e acessibilidade dos dados.' },
+      { id: 'q6', text: 'Os dados estão catalogados com metadados documentados?', options: ['Não catalogados', 'Parcialmente', 'Maioria catalogada', 'Completamente', 'Data Catalog avançado'], help: 'Avalie existência de data catalog, owners definidos e documentação.' },
+      { id: 'q7', text: 'Existe pipeline de dados automatizado (ETL/ELT)?', options: ['Manual', 'Parcialmente automático', 'Maioria automático', 'Totalmente automático', 'Orquestração avançada'], help: 'Considere ferramentas como Airflow, dbt, ou similares.' },
+      { id: 'q8', text: 'A qualidade dos dados é monitorada continuamente?', options: ['Não monitorada', 'Ad-hoc', 'Parcialmente', 'Automatizada', 'Proativa'], help: 'Avalie existência de data quality checks, alertas e correção automatizada.' },
+      { id: 'q9', text: 'Há práticas de data governance estabelecidas?', options: ['Inexistente', 'Iniciando', 'Parcial', 'Estabelecida', 'Madura'], help: 'Considere políticas de acesso, classificação, retenção e privacidade.' },
     ],
   },
   {
     dimension: 'technology',
-    dimensionName: 'Tecnologia & Ferramentas',
+    dimensionName: 'Tecnologia & MLOps',
+    icon: Cpu,
     questions: [
-      { id: 'q13', text: 'A empresa possui infraestrutura para IA?', options: ['Não', 'Básica', 'Intermediária', 'Avançada'] },
-      { id: 'q14', text: 'Existem ferramentas de MLOps implementadas?', options: ['Não', 'Iniciando', 'Parciais', 'Completas'] },
-      { id: 'q15', text: 'Há ambiente sandbox para experimentação?', options: ['Não', 'Planejando', 'Limitado', 'Completo'] },
+      { id: 'q10', text: 'Existem ambientes de desenvolvimento/staging/produção para ML?', options: ['Inexistente', 'Único ambiente', 'Dev/Prod', 'Dev/Staging/Prod', 'Multi-ambiente gerenciado'], help: 'Avalie separação de ambientes e controle de promoção de modelos.' },
+      { id: 'q11', text: 'Há pipeline de CI/CD para modelos de IA?', options: ['Inexistente', 'Manual', 'Parcialmente automático', 'Automático', 'MLOps maduro'], help: 'Considere automação de testes, build, deploy e rollback de modelos.' },
+      { id: 'q12', text: 'Os modelos em produção são monitorados para drift?', options: ['Não monitorados', 'Manual', 'Alertas básicos', 'Monitoramento contínuo', 'Retraining automático'], help: 'Avalie detecção de data drift, concept drift e degradação de performance.' },
+      { id: 'q13', text: 'Existe versionamento de modelos e experimentos?', options: ['Inexistente', 'Informal', 'Parcial', 'Sistemático', 'Avançado'], help: 'Considere uso de ferramentas como MLflow, Weights & Biases, etc.' },
+      { id: 'q14', text: 'Há capacidade de escalar workloads de IA?', options: ['Limitada', 'Básica', 'Moderada', 'Elástica', 'Auto-scaling'], help: 'Avalie capacidade de GPU, processamento paralelo e orquestração.' },
+    ],
+  },
+  {
+    dimension: 'talent',
+    dimensionName: 'Pessoas & Skills',
+    icon: GraduationCap,
+    questions: [
+      { id: 'q15', text: 'Há data scientists/ML engineers dedicados na organização?', options: ['Não há', '1-2 pessoas', 'Time dedicado', 'Múltiplos times', 'CoE estabelecido'], help: 'Considere profissionais com skills técnicas em ML, estatística e engenharia.' },
+      { id: 'q16', text: 'Existe programa de capacitação em IA para colaboradores?', options: ['Inexistente', 'Planejando', 'Piloto', 'Implementado', 'Cultura de aprendizado'], help: 'Avalie trilhas de aprendizado, certificações e tempo dedicado.' },
+      { id: 'q17', text: 'A organização tem "AI Champions" em diferentes áreas?', options: ['Não há', 'Informal', 'Identificados', 'Ativos', 'Rede estruturada'], help: 'Considere pessoas de negócio que evangelizam e apoiam adoção de IA.' },
+      { id: 'q18', text: 'Há clareza sobre papéis e responsabilidades em projetos de IA?', options: ['Confuso', 'Básico', 'Definido', 'Estruturado', 'Modelo operacional claro'], help: 'Avalie RACI, estrutura de times e interação entre TI e negócio.' },
+    ],
+  },
+  {
+    dimension: 'governance',
+    dimensionName: 'Processos & Governança',
+    icon: Shield,
+    questions: [
+      { id: 'q19', text: 'Existem políticas de uso ético e responsável de IA?', options: ['Inexistente', 'Em elaboração', 'Parciais', 'Completas', 'Integradas'], help: 'Considere princípios de IA responsável, fairness, transparência e accountability.' },
+      { id: 'q20', text: 'Há processo formal de avaliação de riscos para IA?', options: ['Inexistente', 'Ad-hoc', 'Definido', 'Sistemático', 'Contínuo'], help: 'Avalie análise de riscos antes do desenvolvimento e em produção.' },
+      { id: 'q21', text: 'Os modelos passam por revisão de bias antes de produção?', options: ['Não passam', 'Esporádico', 'Seletivo', 'Sistemático', 'Obrigatório'], help: 'Considere testes de fairness, análise de grupos protegidos e mitigação.' },
+      { id: 'q22', text: 'Existe documentação de modelos (model cards)?', options: ['Inexistente', 'Básica', 'Parcial', 'Completa', 'Padronizada'], help: 'Avalie documentação de propósito, dados, performance, limitações e uso.' },
+      { id: 'q23', text: 'Há processo de auditoria de decisões de IA?', options: ['Inexistente', 'Reativo', 'Parcial', 'Regular', 'Contínuo'], help: 'Considere logs de decisões, explicabilidade e rastreabilidade.' },
     ],
   },
   {
     dimension: 'adoption',
-    dimensionName: 'Adoção & Escala',
+    dimensionName: 'Cultura & Adoção',
+    icon: Users,
     questions: [
-      { id: 'q16', text: 'Quantos casos de uso de IA estão em produção?', options: ['Nenhum', '1-2', '3-5', '6+'] },
-      { id: 'q17', text: 'Qual o nível de adoção de ferramentas de IA?', options: ['Baixo', 'Moderado', 'Alto', 'Muito alto'] },
-      { id: 'q18', text: 'Os resultados de IA são medidos e comunicados?', options: ['Não', 'Às vezes', 'Frequentemente', 'Sempre'] },
+      { id: 'q24', text: 'Os colaboradores confiam em ferramentas de IA?', options: ['Desconfiança', 'Ceticismo', 'Neutro', 'Confiança', 'Entusiasmo'], help: 'Avalie percepção geral sobre IA e disposição para uso.' },
+      { id: 'q25', text: 'Há resistência significativa à adoção de IA?', options: ['Alta resistência', 'Moderada', 'Alguma', 'Baixa', 'Abraçam mudança'], help: 'Considere change management, comunicação e gestão de expectativas.' },
+      { id: 'q26', text: 'Existem casos de sucesso de IA comunicados internamente?', options: ['Nenhum', 'Poucos', 'Alguns', 'Vários', 'Cultura de compartilhar'], help: 'Avalie storytelling de sucesso, métricas de impacto e reconhecimento.' },
+      { id: 'q27', text: 'A experimentação com IA é encorajada?', options: ['Desencorajada', 'Tolerada', 'Permitida', 'Incentivada', 'Parte da cultura'], help: 'Considere tempo para inovação, acesso a ferramentas e tolerância a falhas.' },
     ],
   },
 ];
@@ -318,8 +334,6 @@ export function MaturityDiagnostic() {
         {/* Results Tab */}
         <TabsContent value="results" activeTab={activeTab}>
           <div className="space-y-6">
-            {/* AI Insights Banner */}
-            <AIInsightBanner insights={insights} onDismiss={() => {}} />
 
             {/* Top Stats */}
             <div className="grid gap-4 md:grid-cols-4">
@@ -574,6 +588,9 @@ export function MaturityDiagnostic() {
                 </div>
               </div>
             </div>
+
+            {/* AI Insights Banner - No final da aba de resultados */}
+            <AIInsightBanner insights={insights} onDismiss={() => {}} />
           </div>
         </TabsContent>
 

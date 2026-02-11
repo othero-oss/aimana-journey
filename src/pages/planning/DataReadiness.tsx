@@ -273,14 +273,6 @@ Como posso ajudar a melhorar a prontidão dos dados?`;
       />
 
       <main className="p-6 space-y-6">
-        {/* AI Insights Banner */}
-        {visibleInsights.length > 0 && (
-          <AIInsightBanner
-            insights={visibleInsights}
-            onDismiss={(id) => setInsightsDismissed((prev) => [...prev, id])}
-          />
-        )}
-
         {/* Tabs */}
         <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
 
@@ -726,6 +718,14 @@ Como posso ajudar a melhorar a prontidão dos dados?`;
             </div>
           </div>
         </TabsContent>
+
+        {/* AI Insights Banner - No final da página */}
+        {visibleInsights.length > 0 && (
+          <AIInsightBanner
+            insights={visibleInsights}
+            onDismiss={(id) => setInsightsDismissed((prev) => [...prev, id])}
+          />
+        )}
       </main>
 
       {/* AI Analysis Modal */}

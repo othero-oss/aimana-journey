@@ -211,8 +211,6 @@ export function Portfolio() {
       />
 
       <main className="p-6 space-y-6">
-        {/* AI Insights Banner */}
-        <AIInsightBanner insights={insights} onDismiss={() => {}} />
 
         {/* Summary Cards */}
         <div className="grid gap-4 md:grid-cols-5">
@@ -619,6 +617,9 @@ export function Portfolio() {
                 </CardContent>
               </Card>
             )}
+
+            {/* AI Insights Banner - No final da página */}
+            <AIInsightBanner insights={insights} onDismiss={() => {}} />
           </div>
         </div>
       </main>
