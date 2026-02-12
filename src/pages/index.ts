@@ -19,6 +19,8 @@ export {
   HealthCheck,
   ROITracker,
   ExecutiveReports,
+  ExcellenceCenter,
+  Operations,
 } from './management';
 export {
   AcademyOverview,

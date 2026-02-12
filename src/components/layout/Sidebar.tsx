@@ -56,7 +56,7 @@ const navigation: NavItem[] = [
     children: [
       { label: 'Agent Studio', href: '/execution/agent-studio' },
       { label: 'AI Sandbox', href: '/execution/sandbox' },
-      { label: 'Agent Factory', href: '/execution/agent-factory' },
+      { label: 'Gestão de Agentes', href: '/execution/agent-management' },
       { label: 'Implementações', href: '/execution/implementation' },
     ],
   },
@@ -66,10 +66,8 @@ const navigation: NavItem[] = [
     icon: <BarChart3 className="h-5 w-5" />,
     phase: 'manage',
     children: [
-      { label: 'Portfolio', href: '/management/portfolio' },
-      { label: 'Health Check', href: '/management/health' },
-      { label: 'ROI Tracker', href: '/management/roi' },
-      { label: 'Relatórios', href: '/management/reports' },
+      { label: 'Centro de Excelência', href: '/management/excellence' },
+      { label: 'Operações', href: '/management/operations' },
     ],
   },
   {

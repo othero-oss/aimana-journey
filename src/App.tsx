@@ -19,10 +19,8 @@ import {
   AgentStudio,
   AgentFactory,
   ManagementOverview,
-  Portfolio,
-  HealthCheck,
-  ROITracker,
-  ExecutiveReports,
+  ExcellenceCenter,
+  Operations,
   IdeasHub,
   ImplementationHub,
   ConnectorsHub,
@@ -69,15 +67,13 @@ function App() {
           <Route path="/execution" element={<ExecutionOverview />} />
           <Route path="/execution/agent-studio" element={<AgentStudio />} />
           <Route path="/execution/sandbox" element={<AISandbox />} />
-          <Route path="/execution/agent-factory" element={<AgentFactory />} />
+          <Route path="/execution/agent-management" element={<AgentFactory />} />
           <Route path="/execution/implementation" element={<ImplementationHub />} />
 
           {/* Management Zone */}
           <Route path="/management" element={<ManagementOverview />} />
-          <Route path="/management/portfolio" element={<Portfolio />} />
-          <Route path="/management/health" element={<HealthCheck />} />
-          <Route path="/management/roi" element={<ROITracker />} />
-          <Route path="/management/reports" element={<ExecutiveReports />} />
+          <Route path="/management/excellence" element={<ExcellenceCenter />} />
+          <Route path="/management/operations" element={<Operations />} />
 
           {/* Academy Zone */}
           <Route path="/academy" element={<AcademyOverview />} />

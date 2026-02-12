@@ -284,6 +284,113 @@ const companyDocuments = [
   { id: 3, name: 'Política de Dados para IA', status: 'draft', version: '0.3', date: '2024-01-20' },
 ];
 
+// Ferramentas de Produtividade
+const productivityTools = [
+  {
+    category: 'Produtividade',
+    icon: Zap,
+    tools: [
+      { name: 'ChatGPT', description: 'Assistente geral para texto, análise e brainstorming', status: 'approved', useCases: ['Redação', 'Brainstorming', 'Análise de texto'], audience: 'Todos' },
+      { name: 'Claude', description: 'Raciocínio avançado, análise de documentos e código', status: 'approved', useCases: ['Análise longa', 'Código', 'Documentação'], audience: 'Todos' },
+      { name: 'GitHub Copilot', description: 'Assistente de código integrado ao IDE', status: 'approved', useCases: ['Autocompletar código', 'Refatoração', 'Testes'], audience: 'Coders' },
+      { name: 'Gemini', description: 'IA multimodal do Google integrada ao Workspace', status: 'testing', useCases: ['Planilhas', 'Apresentações', 'Email'], audience: 'Champions' },
+    ],
+  },
+  {
+    category: 'Comunicação',
+    icon: Globe,
+    tools: [
+      { name: 'Grammarly', description: 'Correção e melhoria de textos em inglês', status: 'approved', useCases: ['E-mails', 'Documentos', 'Apresentações'], audience: 'Todos' },
+      { name: 'Jasper', description: 'Geração de conteúdo para marketing e comunicação', status: 'testing', useCases: ['Blog posts', 'Social media', 'Campanhas'], audience: 'Champions' },
+      { name: 'Otter.ai', description: 'Transcrição e resumo de reuniões', status: 'restricted', useCases: ['Reuniões internas', 'Notas', 'Atas'], audience: 'Champions' },
+    ],
+  },
+  {
+    category: 'Análise de Dados',
+    icon: BarChart3,
+    tools: [
+      { name: 'Julius AI', description: 'Análise de dados com linguagem natural', status: 'testing', useCases: ['Análise exploratória', 'Visualização', 'Relatórios'], audience: 'Champions' },
+      { name: 'Databricks AI', description: 'Plataforma de dados com IA integrada', status: 'approved', useCases: ['Big Data', 'ML pipelines', 'ETL inteligente'], audience: 'Coders' },
+      { name: 'Power BI Copilot', description: 'IA integrada ao Power BI para insights', status: 'testing', useCases: ['Dashboards', 'Narrativas', 'DAX'], audience: 'Todos' },
+    ],
+  },
+  {
+    category: 'Criação de Conteúdo',
+    icon: Edit3,
+    tools: [
+      { name: 'Canva AI', description: 'Design assistido por IA para apresentações e materiais', status: 'approved', useCases: ['Apresentações', 'Social media', 'Infográficos'], audience: 'Todos' },
+      { name: 'Midjourney', description: 'Geração de imagens por IA', status: 'restricted', useCases: ['Conceitos visuais', 'Protótipos', 'Marketing'], audience: 'Champions' },
+      { name: 'Descript', description: 'Edição de áudio e vídeo com IA', status: 'testing', useCases: ['Podcasts', 'Vídeos', 'Treinamentos'], audience: 'Champions' },
+    ],
+  },
+  {
+    category: 'Automação No-Code',
+    icon: Layers,
+    tools: [
+      { name: 'Zapier AI', description: 'Automações inteligentes entre aplicações', status: 'approved', useCases: ['Workflows', 'Integrações', 'Notificações'], audience: 'Champions' },
+      { name: 'Make (Integromat)', description: 'Automação visual de processos complexos', status: 'testing', useCases: ['Processos', 'APIs', 'Data sync'], audience: 'Champions' },
+      { name: 'Microsoft Power Automate', description: 'Automação dentro do ecossistema Microsoft', status: 'approved', useCases: ['Office 365', 'Aprovações', 'Formulários'], audience: 'Todos' },
+    ],
+  },
+];
+
+// Wizard steps para Aplicar Governança
+const wizardSteps = [
+  { id: 1, title: 'Contexto Regulatório', description: 'Defina o ambiente regulatório da sua organização' },
+  { id: 2, title: 'Classificação de Dados', description: 'Categorize os dados utilizados por IA' },
+  { id: 3, title: 'Políticas de Uso', description: 'Estabeleça regras de uso de ferramentas de IA' },
+  { id: 4, title: 'Matriz RACI', description: 'Defina responsabilidades de governança' },
+];
+
+const industrySectors = [
+  'Financeiro / Bancário',
+  'Saúde / Healthcare',
+  'Varejo / E-commerce',
+  'Tecnologia / SaaS',
+  'Indústria / Manufatura',
+  'Educação',
+  'Governo / Setor Público',
+  'Telecomunicações',
+  'Energia / Utilities',
+  'Jurídico',
+  'Outro',
+];
+
+const existingRegulations = [
+  { id: 'lgpd', name: 'LGPD (Lei Geral de Proteção de Dados)', checked: false },
+  { id: 'gdpr', name: 'GDPR (General Data Protection Regulation)', checked: false },
+  { id: 'marco-civil', name: 'Marco Civil da Internet', checked: false },
+  { id: 'ia-act', name: 'EU AI Act', checked: false },
+  { id: 'sox', name: 'SOX (Sarbanes-Oxley)', checked: false },
+  { id: 'hipaa', name: 'HIPAA (Health Insurance Portability)', checked: false },
+  { id: 'pci', name: 'PCI DSS (Payment Card Industry)', checked: false },
+  { id: 'bacen', name: 'Regulamentações BACEN', checked: false },
+  { id: 'iso27001', name: 'ISO 27001', checked: false },
+  { id: 'nist', name: 'NIST AI Framework', checked: false },
+];
+
+const dataCategories = [
+  { id: 1, name: 'Dados Pessoais de Clientes', sensitivity: '' },
+  { id: 2, name: 'Dados Financeiros', sensitivity: '' },
+  { id: 3, name: 'Dados de Colaboradores', sensitivity: '' },
+  { id: 4, name: 'Dados de Propriedade Intelectual', sensitivity: '' },
+  { id: 5, name: 'Dados de Marketing/Analytics', sensitivity: '' },
+  { id: 6, name: 'Dados Operacionais', sensitivity: '' },
+  { id: 7, name: 'Dados de Saúde', sensitivity: '' },
+  { id: 8, name: 'Comunicações Internas', sensitivity: '' },
+];
+
+const sensitivityLevels = [
+  { value: 'publico', label: 'Público', color: 'bg-status-success text-white' },
+  { value: 'interno', label: 'Interno', color: 'bg-aimana-teal text-white' },
+  { value: 'confidencial', label: 'Confidencial', color: 'bg-status-warning text-white' },
+  { value: 'restrito', label: 'Restrito', color: 'bg-status-error text-white' },
+];
+
+const raciRoles = ['CEO', 'CTO', 'DPO', 'TI', 'Legal'];
+const raciActivities = ['Aprovação de Modelo', 'Deploy de Agente', 'Uso de Dados', 'Treinamento'];
+const raciOptions = ['R', 'A', 'C', 'I', '-'];
+
 const statusConfig = {
   completed: { label: 'Concluído', color: 'text-status-success', bgColor: 'bg-status-success-bg', icon: CheckCircle2 },
   in_progress: { label: 'Em andamento', color: 'text-status-warning', bgColor: 'bg-status-warning-bg', icon: Settings },
@@ -465,6 +572,555 @@ function StackComparisonCard({ stack }: { stack: typeof stackRecommendations[0] 
 }
 
 // ============================================================================
+// SEÇÃO: FERRAMENTAS DE PRODUTIVIDADE (Stack tab)
+// ============================================================================
+
+const toolStatusConfig = {
+  approved: { label: 'Aprovado', color: 'bg-status-success text-white' },
+  testing: { label: 'Em Teste', color: 'bg-status-warning text-white' },
+  restricted: { label: 'Restrito', color: 'bg-status-error text-white' },
+};
+
+const audienceConfig = {
+  Todos: { label: 'Todos', color: 'bg-aimana-navy text-white' },
+  Champions: { label: 'Champions', color: 'bg-phase-plan text-white' },
+  Coders: { label: 'Coders', color: 'bg-aimana-teal text-white' },
+};
+
+function ProductivityToolsSection() {
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-text">Ferramentas de Produtividade</h2>
+          <p className="text-sm text-text-secondary">Ferramentas de IA aprovadas e em avaliação para uso na organização</p>
+        </div>
+      </div>
+
+      {/* Champions note */}
+      <Card className="bg-gradient-to-r from-phase-plan/10 to-aimana-teal/10 border-phase-plan/30">
+        <CardContent className="p-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-full bg-phase-plan/20">
+              <Users className="h-5 w-5 text-phase-plan" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-text">Sobre Champions</h4>
+              <p className="text-sm text-text-secondary mt-1">
+                Areas com Champions formados podem desenvolver testes, automacoes e solucoes no-code.
+                Champions atuam como multiplicadores de IA em suas equipes e tem acesso a ferramentas em fase de teste.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Tools by category */}
+      <div className="space-y-4">
+        {productivityTools.map((category) => (
+          <Card key={category.category} className="overflow-hidden">
+            <CardHeader
+              className="pb-3 cursor-pointer hover:bg-surface-light/50 transition-colors"
+              onClick={() => setExpandedCategory(expandedCategory === category.category ? null : category.category)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-aimana-navy/10">
+                    <category.icon className="h-5 w-5 text-aimana-navy" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">{category.category}</CardTitle>
+                    <CardDescription className="text-xs">{category.tools.length} ferramentas</CardDescription>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  {category.tools.filter(t => t.status === 'approved').length > 0 && (
+                    <Badge variant="success" size="sm">
+                      {category.tools.filter(t => t.status === 'approved').length} aprovadas
+                    </Badge>
+                  )}
+                  <ArrowRight className={cn(
+                    'h-4 w-4 text-text-muted transition-transform',
+                    expandedCategory === category.category && 'rotate-90'
+                  )} />
+                </div>
+              </div>
+            </CardHeader>
+            {(expandedCategory === category.category) && (
+              <CardContent className="pt-0">
+                <div className="space-y-3">
+                  {category.tools.map((tool, idx) => {
+                    const statusCfg = toolStatusConfig[tool.status as keyof typeof toolStatusConfig];
+                    const audienceCfg = audienceConfig[tool.audience as keyof typeof audienceConfig];
+                    return (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-lg border border-surface-border hover:border-aimana-teal/30 transition-colors"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm font-semibold text-text">{tool.name}</span>
+                            <Badge className={cn('text-xs', statusCfg.color)}>{statusCfg.label}</Badge>
+                            <Badge className={cn('text-xs', audienceCfg.color)}>{audienceCfg.label}</Badge>
+                          </div>
+                        </div>
+                        <p className="text-xs text-text-secondary mb-3">{tool.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {tool.useCases.map((useCase, i) => (
+                            <Badge key={i} variant="secondary" size="sm" className="text-xs">
+                              {useCase}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// SEÇÃO: APLICAR GOVERNANÇA (Wizard)
+// ============================================================================
+
+function GovernanceWizard({ openAIModal }: { openAIModal: (title: string, context: string) => void }) {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerated, setIsGenerated] = useState(false);
+
+  // Step 1 state
+  const [industrySector, setIndustrySector] = useState('');
+  const [regulations, setRegulations] = useState(existingRegulations.map(r => ({ ...r })));
+  const [privacyLevel, setPrivacyLevel] = useState('');
+
+  // Step 2 state
+  const [dataClassification, setDataClassification] = useState(dataCategories.map(d => ({ ...d })));
+
+  // Step 3 state
+  const [aiUsageRules, setAiUsageRules] = useState('');
+  const [allowedTools, setAllowedTools] = useState('');
+  const [prohibitedActions, setProhibitedActions] = useState('');
+
+  // Step 4 state
+  const [raciMatrix, setRaciMatrix] = useState<Record<string, Record<string, string>>>(
+    raciActivities.reduce((acc, activity) => {
+      acc[activity] = raciRoles.reduce((roleAcc, role) => {
+        roleAcc[role] = '-';
+        return roleAcc;
+      }, {} as Record<string, string>);
+      return acc;
+    }, {} as Record<string, Record<string, string>>)
+  );
+
+  const handleRegulationToggle = (id: string) => {
+    setRegulations(prev => prev.map(r => r.id === id ? { ...r, checked: !r.checked } : r));
+  };
+
+  const handleDataSensitivity = (id: number, sensitivity: string) => {
+    setDataClassification(prev => prev.map(d => d.id === id ? { ...d, sensitivity } : d));
+  };
+
+  const handleRaciChange = (activity: string, role: string, value: string) => {
+    setRaciMatrix(prev => ({
+      ...prev,
+      [activity]: {
+        ...prev[activity],
+        [role]: value,
+      },
+    }));
+  };
+
+  const handleGenerate = () => {
+    setIsGenerating(true);
+    setTimeout(() => {
+      setIsGenerating(false);
+      setIsGenerated(true);
+    }, 3000);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <Sparkles className="h-5 w-5 text-aimana-teal" />
+            <span className="text-sm font-medium text-aimana-teal">GovernanceCopilot</span>
+          </div>
+          <h2 className="text-lg font-semibold text-text">Aplicar Governanca de IA</h2>
+          <p className="text-sm text-text-secondary">Preencha as informacoes para gerar sua politica de governanca personalizada</p>
+        </div>
+      </div>
+
+      {/* Stepper */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            {wizardSteps.map((step, idx) => (
+              <div key={step.id} className="flex items-center flex-1">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={cn(
+                      'w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold transition-colors cursor-pointer',
+                      currentStep === step.id
+                        ? 'bg-aimana-teal text-white'
+                        : currentStep > step.id
+                        ? 'bg-status-success text-white'
+                        : 'bg-surface-light text-text-muted'
+                    )}
+                    onClick={() => setCurrentStep(step.id)}
+                  >
+                    {currentStep > step.id ? (
+                      <CheckCircle2 className="h-5 w-5" />
+                    ) : (
+                      step.id
+                    )}
+                  </div>
+                  <div className="hidden md:block">
+                    <p className={cn('text-sm font-medium', currentStep === step.id ? 'text-text' : 'text-text-muted')}>
+                      {step.title}
+                    </p>
+                    <p className="text-xs text-text-muted">{step.description}</p>
+                  </div>
+                </div>
+                {idx < wizardSteps.length - 1 && (
+                  <div className={cn(
+                    'flex-1 h-px mx-4',
+                    currentStep > step.id ? 'bg-status-success' : 'bg-surface-border'
+                  )} />
+                )}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Step Content */}
+      {/* Step 1: Contexto Regulatório */}
+      {currentStep === 1 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Contexto Regulatorio</CardTitle>
+            <CardDescription>Defina o setor e as regulamentacoes aplicaveis a sua organizacao</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Industry Sector */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Setor de Atuacao</label>
+              <select
+                value={industrySector}
+                onChange={(e) => setIndustrySector(e.target.value)}
+                className="w-full md:w-96 text-sm border border-surface-border rounded-md px-3 py-2 bg-white"
+              >
+                <option value="">Selecione o setor...</option>
+                {industrySectors.map((sector) => (
+                  <option key={sector} value={sector}>{sector}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Existing Regulations */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Regulamentacoes Aplicaveis</label>
+              <p className="text-xs text-text-muted mb-3">Selecione todas as regulamentacoes que se aplicam a sua organizacao</p>
+              <div className="grid gap-2 md:grid-cols-2">
+                {regulations.map((regulation) => (
+                  <label
+                    key={regulation.id}
+                    className={cn(
+                      'flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors',
+                      regulation.checked
+                        ? 'bg-aimana-teal/10 border-aimana-teal/30'
+                        : 'bg-white border-surface-border hover:border-aimana-teal/20'
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={regulation.checked}
+                      onChange={() => handleRegulationToggle(regulation.id)}
+                      className="rounded border-surface-border text-aimana-teal focus:ring-aimana-teal"
+                    />
+                    <span className="text-sm text-text">{regulation.name}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Privacy Level */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Nivel de Privacidade de Dados</label>
+              <div className="flex gap-3">
+                {['Basico', 'Intermediario', 'Avancado', 'Maximo'].map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => setPrivacyLevel(level)}
+                    className={cn(
+                      'px-4 py-2 rounded-lg border text-sm font-medium transition-colors',
+                      privacyLevel === level
+                        ? 'bg-aimana-teal text-white border-aimana-teal'
+                        : 'bg-white border-surface-border text-text-secondary hover:border-aimana-teal/30'
+                    )}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step 2: Classificação de Dados */}
+      {currentStep === 2 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Classificacao de Dados</CardTitle>
+            <CardDescription>Categorize os tipos de dados que sua organizacao utiliza com IA</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {dataClassification.map((data) => (
+                <div
+                  key={data.id}
+                  className="flex items-center justify-between p-4 rounded-lg border border-surface-border"
+                >
+                  <div className="flex items-center gap-3">
+                    <Database className="h-4 w-4 text-text-muted" />
+                    <span className="text-sm font-medium text-text">{data.name}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    {sensitivityLevels.map((level) => (
+                      <button
+                        key={level.value}
+                        onClick={() => handleDataSensitivity(data.id, level.value)}
+                        className={cn(
+                          'px-3 py-1 rounded-md text-xs font-medium transition-colors',
+                          data.sensitivity === level.value
+                            ? level.color
+                            : 'bg-surface-light text-text-muted hover:bg-surface-border'
+                        )}
+                      >
+                        {level.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step 3: Políticas de Uso */}
+      {currentStep === 3 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Politicas de Uso</CardTitle>
+            <CardDescription>Estabeleca as regras para uso de ferramentas de IA na organizacao</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Regras Gerais de Uso de IA</label>
+              <textarea
+                value={aiUsageRules}
+                onChange={(e) => setAiUsageRules(e.target.value)}
+                placeholder="Ex: Todos os colaboradores podem usar ferramentas de IA aprovadas para tarefas do dia a dia. Dados confidenciais nao devem ser inseridos em ferramentas externas..."
+                className="w-full h-32 text-sm border border-surface-border rounded-md px-3 py-2 bg-white resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Ferramentas Permitidas</label>
+              <textarea
+                value={allowedTools}
+                onChange={(e) => setAllowedTools(e.target.value)}
+                placeholder="Ex: ChatGPT (via plano Enterprise), Claude (via API corporativa), GitHub Copilot, Canva AI..."
+                className="w-full h-24 text-sm border border-surface-border rounded-md px-3 py-2 bg-white resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-text mb-2">Acoes Proibidas</label>
+              <textarea
+                value={prohibitedActions}
+                onChange={(e) => setProhibitedActions(e.target.value)}
+                placeholder="Ex: Inserir dados pessoais de clientes em ferramentas publicas, usar IA para decisoes automaticas sem revisao humana, compartilhar outputs de IA sem validacao..."
+                className="w-full h-24 text-sm border border-surface-border rounded-md px-3 py-2 bg-white resize-none"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Step 4: Matriz RACI */}
+      {currentStep === 4 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Matriz RACI</CardTitle>
+            <CardDescription>
+              Defina responsabilidades: <strong>R</strong>esponsavel, <strong>A</strong>provador,
+              <strong> C</strong>onsultado, <strong>I</strong>nformado
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-surface-border">
+                    <th className="text-left text-sm font-medium text-text p-3">Atividade</th>
+                    {raciRoles.map((role) => (
+                      <th key={role} className="text-center text-sm font-medium text-text p-3">{role}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {raciActivities.map((activity) => (
+                    <tr key={activity} className="border-b border-surface-border/50">
+                      <td className="text-sm text-text p-3 font-medium">{activity}</td>
+                      {raciRoles.map((role) => (
+                        <td key={role} className="text-center p-3">
+                          <select
+                            value={raciMatrix[activity]?.[role] || '-'}
+                            onChange={(e) => handleRaciChange(activity, role, e.target.value)}
+                            className={cn(
+                              'w-14 text-center text-sm border border-surface-border rounded-md px-1 py-1 bg-white font-semibold',
+                              raciMatrix[activity]?.[role] === 'R' && 'text-status-error',
+                              raciMatrix[activity]?.[role] === 'A' && 'text-status-warning',
+                              raciMatrix[activity]?.[role] === 'C' && 'text-aimana-teal',
+                              raciMatrix[activity]?.[role] === 'I' && 'text-aimana-navy',
+                            )}
+                          >
+                            {raciOptions.map((option) => (
+                              <option key={option} value={option}>{option}</option>
+                            ))}
+                          </select>
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="flex items-center gap-6 mt-4 pt-4 border-t border-surface-border text-xs text-text-muted">
+              <span><strong className="text-status-error">R</strong> = Responsavel</span>
+              <span><strong className="text-status-warning">A</strong> = Aprovador</span>
+              <span><strong className="text-aimana-teal">C</strong> = Consultado</span>
+              <span><strong className="text-aimana-navy">I</strong> = Informado</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Navigation & Generate */}
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+          disabled={currentStep === 1}
+        >
+          Voltar
+        </Button>
+
+        <div className="flex items-center gap-3">
+          {currentStep < 4 ? (
+            <Button onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}>
+              Proximo
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          ) : (
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="bg-aimana-teal hover:bg-aimana-teal/90"
+            >
+              {isGenerating ? (
+                <>
+                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                  Gerando Politica...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Gerar Politica de Governanca
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Generated Result */}
+      {isGenerated && (
+        <Card className="bg-gradient-to-r from-aimana-teal/10 to-phase-plan/10 border-aimana-teal/30">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-full bg-aimana-teal/20">
+                  <CheckCircle2 className="h-6 w-6 text-aimana-teal" />
+                </div>
+                <div>
+                  <CardTitle>Politica de Governanca Gerada</CardTitle>
+                  <CardDescription>Revisao e aprovacao pendente</CardDescription>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm">
+                  <Eye className="h-4 w-4 mr-1" />
+                  Visualizar
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Download className="h-4 w-4 mr-1" />
+                  Exportar PDF
+                </Button>
+                <Button variant="outline" size="sm">
+                  <Edit3 className="h-4 w-4 mr-1" />
+                  Editar
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <div className="p-4 bg-white rounded-lg border border-surface-border">
+                <div className="text-xs text-text-muted mb-1">Setor</div>
+                <div className="text-sm font-medium text-text">{industrySector || 'Nao definido'}</div>
+              </div>
+              <div className="p-4 bg-white rounded-lg border border-surface-border">
+                <div className="text-xs text-text-muted mb-1">Regulamentacoes</div>
+                <div className="text-sm font-medium text-text">{regulations.filter(r => r.checked).length} selecionadas</div>
+              </div>
+              <div className="p-4 bg-white rounded-lg border border-surface-border">
+                <div className="text-xs text-text-muted mb-1">Dados Classificados</div>
+                <div className="text-sm font-medium text-text">{dataClassification.filter(d => d.sensitivity).length}/{dataClassification.length}</div>
+              </div>
+              <div className="p-4 bg-white rounded-lg border border-surface-border">
+                <div className="text-xs text-text-muted mb-1">Nivel de Privacidade</div>
+                <div className="text-sm font-medium text-text">{privacyLevel || 'Nao definido'}</div>
+              </div>
+            </div>
+            <div className="mt-4 p-4 bg-white rounded-lg border border-surface-border">
+              <p className="text-sm text-text-secondary">
+                A politica de governanca foi gerada com base nas informacoes fornecidas. O documento inclui:
+                contexto regulatorio, classificacao de dados, politicas de uso de IA, e matriz RACI de responsabilidades.
+                Recomendamos revisao pelo DPO e pelo departamento juridico antes da aprovacao final.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// ============================================================================
 // COMPONENTE PRINCIPAL
 // ============================================================================
 
@@ -517,6 +1173,10 @@ export function Governance() {
             <TabsTrigger value="templates">
               <FileText className="h-4 w-4 mr-2" />
               Templates & Documentos
+            </TabsTrigger>
+            <TabsTrigger value="apply">
+              <CheckSquare className="h-4 w-4 mr-2" />
+              Aplicar Governanca
             </TabsTrigger>
           </TabsList>
 
@@ -725,6 +1385,12 @@ export function Governance() {
           {/* ABA 2: STACK TECNOLÓGICO */}
           {/* ================================================================ */}
           <TabsContent value="stack" className="space-y-6">
+            {/* Ferramentas de Produtividade */}
+            <ProductivityToolsSection />
+
+            {/* Divider */}
+            <div className="border-t border-surface-border pt-2" />
+
             {/* Header com ações */}
             <div className="flex items-center justify-between">
               <div>
@@ -972,6 +1638,13 @@ export function Governance() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* ================================================================ */}
+          {/* ABA 4: APLICAR GOVERNANÇA */}
+          {/* ================================================================ */}
+          <TabsContent value="apply" className="space-y-6">
+            <GovernanceWizard openAIModal={openAIModal} />
           </TabsContent>
         </Tabs>
 
