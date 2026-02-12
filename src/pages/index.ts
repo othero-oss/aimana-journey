@@ -10,8 +10,7 @@ export {
 export {
   ExecutionOverview,
   AISandbox,
-  AgentStudio,
-  AgentFactory,
+  AIImplementations,
 } from './execution';
 export {
   ManagementOverview,
@@ -21,6 +20,7 @@ export {
   ExecutiveReports,
   ExcellenceCenter,
   Operations,
+  Reports,
 } from './management';
 export {
   AcademyOverview,
@@ -32,5 +32,4 @@ export {
   Certifications,
 } from './academy';
 export { IdeasHub } from './ideas';
-export { ImplementationHub } from './implementation';
 export { ConnectorsHub } from './connectors';

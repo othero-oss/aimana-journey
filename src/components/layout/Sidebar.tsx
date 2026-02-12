@@ -54,10 +54,8 @@ const navigation: NavItem[] = [
     icon: <Rocket className="h-5 w-5" />,
     phase: 'execute',
     children: [
-      { label: 'Agent Studio', href: '/execution/agent-studio' },
       { label: 'AI Sandbox', href: '/execution/sandbox' },
-      { label: 'Gestão de Agentes', href: '/execution/agent-management' },
-      { label: 'Implementações', href: '/execution/implementation' },
+      { label: 'Implementações IA', href: '/execution/implementations' },
     ],
   },
   {
@@ -68,6 +66,7 @@ const navigation: NavItem[] = [
     children: [
       { label: 'Centro de Excelência', href: '/management/excellence' },
       { label: 'Operações', href: '/management/operations' },
+      { label: 'Relatórios', href: '/management/reports' },
     ],
   },
   {
@@ -139,10 +138,9 @@ export function Sidebar() {
           {navigation.map((item) => (
             <li key={item.href}>
               {item.children ? (
-                // Item with submenu
+                // Item with submenu - label is a NavLink, chevron toggles expand
                 <div>
-                  <button
-                    onClick={() => toggleExpand(item.href)}
+                  <div
                     className={cn(
                       'flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                       isActive(item.href)
@@ -150,19 +148,30 @@ export function Sidebar() {
                         : 'text-white/70 hover:bg-white/5 hover:text-white'
                     )}
                   >
-                    <div className="flex items-center gap-3">
+                    <NavLink
+                      to={item.href}
+                      className="flex flex-1 items-center gap-3"
+                    >
                       <span className={cn(getPhaseColor(item.phase))}>
                         {item.icon}
                       </span>
                       <span>{item.label}</span>
-                    </div>
-                    <ChevronDown
-                      className={cn(
-                        'h-4 w-4 transition-transform',
-                        expandedItems.includes(item.href) && 'rotate-180'
-                      )}
-                    />
-                  </button>
+                    </NavLink>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleExpand(item.href);
+                      }}
+                      className="ml-2 rounded p-0.5 hover:bg-white/10"
+                    >
+                      <ChevronDown
+                        className={cn(
+                          'h-4 w-4 transition-transform',
+                          expandedItems.includes(item.href) && 'rotate-180'
+                        )}
+                      />
+                    </button>
+                  </div>
 
                   {/* Submenu */}
                   {expandedItems.includes(item.href) && (

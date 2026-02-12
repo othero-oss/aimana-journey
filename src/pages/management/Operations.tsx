@@ -6,7 +6,6 @@
  * Abas:
  * - Monitoramento: Status em tempo real dos agentes
  * - Incidentes: Timeline de incidentes e severidade
- * - Relatórios: Templates e geração de relatórios
  * ===============================================================================
  */
 
@@ -161,12 +160,6 @@ const incidents = [
   },
 ];
 
-const reportTemplates = [
-  { id: 1, name: 'Relatório Executivo Semanal', description: 'Resumo de métricas para liderança', frequency: 'Semanal', format: 'PDF', lastGenerated: '2025-02-07' },
-  { id: 2, name: 'Status Mensal de Agentes', description: 'Performance e health check de todos os agentes', frequency: 'Mensal', format: 'PDF/Excel', lastGenerated: '2025-01-31' },
-  { id: 3, name: 'ROI Trimestral', description: 'Análise de retorno sobre investimento', frequency: 'Trimestral', format: 'PPT', lastGenerated: '2025-01-15' },
-  { id: 4, name: 'Incidentes da Semana', description: 'Timeline de incidentes e resoluções', frequency: 'Semanal', format: 'PDF', lastGenerated: '2025-02-07' },
-];
 
 const statusConfig = {
   running: { label: 'Rodando', color: 'text-status-success', bg: 'bg-status-success-bg', icon: CheckCircle2 },
@@ -212,7 +205,6 @@ export function Operations() {
   const tabs = [
     { id: 'monitoring', label: 'Monitoramento', icon: <Activity className="h-4 w-4" /> },
     { id: 'incidents', label: 'Incidentes', icon: <AlertTriangle className="h-4 w-4" />, badge: openIncidents > 0 ? openIncidents.toString() : undefined },
-    { id: 'reports', label: 'Relatórios', icon: <FileText className="h-4 w-4" /> },
   ];
 
   const handleAIMessage = async (message: string): Promise<string> => {
@@ -593,142 +585,6 @@ Como posso ajudar?`;
           </div>
         </TabsContent>
 
-        {/* ================================================================ */}
-        {/* ABA 3: RELATÓRIOS */}
-        {/* ================================================================ */}
-        <TabsContent value="reports" activeTab={activeTab}>
-          <div className="grid gap-6 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-6">
-              {/* Templates de Relatório */}
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle>Templates de Relatório</CardTitle>
-                      <CardDescription>Gere relatórios com um clique ou agende</CardDescription>
-                    </div>
-                    <AIActionButton
-                      label="Gerar com IA"
-                      icon={<Sparkles className="h-4 w-4" />}
-                      onClick={() => setShowReportModal(true)}
-                    />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    {reportTemplates.map((template) => (
-                      <div key={template.id} className="p-4 rounded-lg border border-surface-border hover:border-aimana-teal/50 transition-colors">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-surface-light">
-                            <FileText className="h-5 w-5 text-aimana-navy" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-medium text-text">{template.name}</h4>
-                            <p className="text-sm text-text-muted mb-2">{template.description}</p>
-                            <div className="flex items-center gap-3 text-xs text-text-muted">
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                {template.frequency}
-                              </span>
-                              <Badge variant="outline" size="sm">{template.format}</Badge>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 mt-4">
-                          <Button variant="outline" size="sm" className="flex-1">
-                            <Eye className="h-4 w-4 mr-1" />
-                            Preview
-                          </Button>
-                          <Button size="sm" className="flex-1">
-                            <Download className="h-4 w-4 mr-1" />
-                            Gerar
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Relatórios Recentes */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>Relatórios Recentes</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {reportTemplates.slice(0, 3).map((template) => (
-                      <div key={template.id} className="flex items-center justify-between p-3 rounded-lg bg-surface-light">
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-5 w-5 text-aimana-navy" />
-                          <div>
-                            <p className="text-sm font-medium text-text">{template.name}</p>
-                            <p className="text-xs text-text-muted">Gerado em {template.lastGenerated}</p>
-                          </div>
-                        </div>
-                        <Button variant="ghost" size="sm">
-                          <Download className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Agendar Relatório */}
-              <Card className="bg-gradient-header text-white">
-                <CardContent className="p-4">
-                  <h3 className="font-semibold mb-2 flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
-                    Agendar Envio
-                  </h3>
-                  <p className="text-sm text-white/80 mb-4">
-                    Configure relatórios automáticos para serem enviados por email.
-                  </p>
-                  <Button variant="outline" className="w-full border-white/30 text-white hover:bg-white/10">
-                    Configurar Agendamento
-                  </Button>
-                </CardContent>
-              </Card>
-
-              {/* Exportação Rápida */}
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base">Exportação Rápida</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Métricas de Hoje (CSV)
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Logs de Incidentes (JSON)
-                  </Button>
-                  <Button variant="outline" size="sm" className="w-full justify-start">
-                    <Download className="h-4 w-4 mr-2" />
-                    Dashboard Completo (PDF)
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-
-          {/* AI Insights Banner - No final */}
-          <AIInsightBanner
-            title="Análise Operacional"
-            insights={[
-              `${runningCount} agentes rodando com uptime médio de ${avgUptime.toFixed(1)}%`,
-              `${openIncidents} incidente(s) em aberto requerem atenção`,
-              `Custo operacional hoje: R$ ${totalCostToday.toFixed(2)}`,
-            ]}
-            onAnalyze={() => setShowReportModal(true)}
-            className="mt-6"
-          />
-        </TabsContent>
       </main>
 
       {/* AI Report Modal */}
