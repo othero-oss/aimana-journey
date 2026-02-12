@@ -190,7 +190,7 @@ export function Operations() {
   const [activeTab, setActiveTab] = useState('monitoring');
   const [selectedAgent, setSelectedAgent] = useState<typeof agents[0] | null>(null);
   const [filterSeverity, setFilterSeverity] = useState('all');
-  const [showReportModal, setShowReportModal] = useState(false);
+  const [showOpsModal, setShowOpsModal] = useState(false);
 
   // Cálculos
   const runningCount = agents.filter(a => a.status === 'running').length;
@@ -322,7 +322,7 @@ Como posso ajudar?`;
                     </Button>
                     <AIActionButton
                       label="Análise"
-                      onClick={() => setShowReportModal(true)}
+                      onClick={() => setShowOpsModal(true)}
                       size="sm"
                     />
                   </div>
@@ -587,14 +587,14 @@ Como posso ajudar?`;
 
       </main>
 
-      {/* AI Report Modal */}
+      {/* AI Operations Modal */}
       <AIModal
-        title="Assistente de Relatórios"
-        description="Gere relatórios personalizados com ajuda da IA"
-        isOpen={showReportModal}
-        onClose={() => setShowReportModal(false)}
-        agentName="Report Assistant"
-        agentDescription="Especialista em análise e geração de relatórios"
+        title="Assistente Operacional"
+        description="Análise inteligente de operações e incidentes"
+        isOpen={showOpsModal}
+        onClose={() => setShowOpsModal(false)}
+        agentName="Ops Assistant"
+        agentDescription="Especialista em análise operacional e diagnóstico de agentes"
         initialMessage={`Olá! Posso ajudar a gerar relatórios personalizados.
 
 **Dados disponíveis:**

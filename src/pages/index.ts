@@ -14,10 +14,6 @@ export {
 } from './execution';
 export {
   ManagementOverview,
-  Portfolio,
-  HealthCheck,
-  ROITracker,
-  ExecutiveReports,
   ExcellenceCenter,
   Operations,
   Reports,

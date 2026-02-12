@@ -118,7 +118,7 @@ const quickActions = [
   {
     title: 'Submeter Ideia',
     description: 'Proponha uma nova aplicação de IA',
-    href: '/ideas',
+    href: '/planning/ideas',
     icon: BrainCircuit,
     color: 'bg-aimana-navy',
   },
@@ -286,10 +286,8 @@ export function Dashboard() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li>• Trilhas de Aprendizado</li>
-                  <li>• Agent Prototype Studio</li>
                   <li>• AI Sandbox</li>
-                  <li>• Agent Factory</li>
+                  <li>• Implementações IA</li>
                 </ul>
                 <div className="mt-4">
                   <Progress value={30} variant="primary" size="sm" />
@@ -315,10 +313,9 @@ export function Dashboard() {
               </CardHeader>
               <CardContent>
                 <ul className="space-y-2 text-sm text-text-secondary">
-                  <li>• Portfolio Dashboard</li>
-                  <li>• Health Check de Agentes</li>
-                  <li>• ROI Tracker</li>
-                  <li>• Relatórios Executivos</li>
+                  <li>• Centro de Excelência</li>
+                  <li>• Operações</li>
+                  <li>• Relatórios</li>
                 </ul>
                 <div className="mt-4">
                   <Progress value={15} variant="navy" size="sm" />
