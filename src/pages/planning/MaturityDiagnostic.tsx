@@ -730,21 +730,27 @@ export function MaturityDiagnostic() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {currentQuestions.map((question, qIndex) => (
-                        <div key={question.id} className="space-y-3">
-                          <p className="font-medium text-white">
+                        <div key={question.id} className="p-4 rounded-xl border border-surface-border bg-surface-light space-y-3">
+                          <p className="font-semibold text-text text-base leading-relaxed">
                             {qIndex + 1}. {question.text}
                           </p>
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                          {question.help && (
+                            <p className="text-sm text-text-secondary leading-relaxed">
+                              {question.help}
+                            </p>
+                          )}
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 pt-1">
                             {question.options.map((option, optIndex) => (
                               <button
                                 key={optIndex}
                                 onClick={() => handleAnswerChange(question.id, optIndex)}
-                                className={`p-3 rounded-lg border text-sm transition-all ${
+                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
                                   answers[question.id] === optIndex
-                                    ? 'border-teal-500 bg-teal-500/20 text-teal-400'
-                                    : 'border-navy-700 bg-navy-800 text-slate-300 hover:border-navy-600'
+                                    ? 'border-aimana-teal bg-aimana-teal/10 text-aimana-blue ring-1 ring-aimana-teal/30'
+                                    : 'border-surface-border bg-white text-text-secondary hover:border-aimana-blue/30 hover:bg-surface-hover'
                                 }`}
                               >
+                                <span className="block text-xs text-text-muted mb-0.5">{optIndex}</span>
                                 {option}
                               </button>
                             ))}
@@ -752,7 +758,7 @@ export function MaturityDiagnostic() {
                         </div>
                       ))}
 
-                      <div className="flex justify-between pt-4 border-t border-navy-700">
+                      <div className="flex justify-between pt-4 border-t border-surface-border">
                         <Button
                           variant="outline"
                           onClick={() => setCurrentDimensionIndex(Math.max(0, currentDimensionIndex - 1))}
