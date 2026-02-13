@@ -37,15 +37,6 @@ export default {
           mint: colors.aimana.mint,
         },
 
-        // Navy scale (dark theme backgrounds)
-        navy: {
-          600: '#1A3050',
-          700: '#122240',
-          800: '#0F2847',
-          900: '#0A1628',
-          950: '#060E1A',
-        },
-
         // Journey Phase Colors
         phase: {
           plan: colors.phase.plan,

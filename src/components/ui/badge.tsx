@@ -15,7 +15,7 @@ const badgeVariants = cva(
     variants: {
       variant: {
         // Default - Neutral
-        default: 'border-white/10 bg-white/5 text-slate-300',
+        default: 'border-surface-border bg-surface-light text-text-secondary',
 
         // Phase variants (Journey stages)
         plan: 'border-phase-plan-border bg-phase-plan-bg text-phase-plan',
@@ -35,7 +35,7 @@ const badgeVariants = cva(
         navy: 'border-transparent bg-aimana-navy text-white',
 
         // Outline variants
-        outline: 'border-white/15 bg-transparent text-slate-300',
+        outline: 'border-surface-border bg-transparent text-text',
         'outline-primary': 'border-aimana-teal bg-transparent text-aimana-teal',
       },
       size: {

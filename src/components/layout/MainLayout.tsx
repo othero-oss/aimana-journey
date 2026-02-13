@@ -9,7 +9,7 @@ import { Sidebar } from './Sidebar';
 
 export function MainLayout() {
   return (
-    <div className="min-h-screen bg-navy-900">
+    <div className="min-h-screen bg-surface-light">
       {/* Sidebar */}
       <Sidebar />
 

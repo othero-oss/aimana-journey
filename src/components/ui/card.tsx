@@ -10,7 +10,7 @@ import { cn } from '../../lib/utils';
 
 const cardVariants = cva(
   // Base styles
-  'rounded-xl border bg-navy-800 transition-all duration-200',
+  'rounded-xl border bg-white transition-all duration-200',
   {
     variants: {
       variant: {
@@ -76,7 +76,7 @@ const CardTitle = React.forwardRef<
   <h3
     ref={ref}
     className={cn(
-      'text-lg font-semibold leading-none tracking-tight text-white',
+      'text-lg font-semibold leading-none tracking-tight text-text',
       className
     )}
     {...props}
@@ -90,7 +90,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-slate-400', className)}
+    className={cn('text-sm text-text-secondary', className)}
     {...props}
   />
 ));

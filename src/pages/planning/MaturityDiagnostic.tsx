@@ -730,27 +730,21 @@ export function MaturityDiagnostic() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {currentQuestions.map((question, qIndex) => (
-                        <div key={question.id} className="p-4 rounded-xl bg-navy-800/60 border border-navy-700 space-y-3">
-                          <p className="font-semibold text-white text-base leading-relaxed">
+                        <div key={question.id} className="space-y-3">
+                          <p className="font-medium text-white">
                             {qIndex + 1}. {question.text}
                           </p>
-                          {question.help && (
-                            <p className="text-sm text-slate-400 leading-relaxed">
-                              {question.help}
-                            </p>
-                          )}
-                          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 pt-1">
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                             {question.options.map((option, optIndex) => (
                               <button
                                 key={optIndex}
                                 onClick={() => handleAnswerChange(question.id, optIndex)}
-                                className={`p-3 rounded-lg border text-sm font-medium transition-all ${
+                                className={`p-3 rounded-lg border text-sm transition-all ${
                                   answers[question.id] === optIndex
-                                    ? 'border-teal-500 bg-teal-500/20 text-teal-300 ring-1 ring-teal-500/30'
-                                    : 'border-slate-600 bg-slate-800/80 text-slate-200 hover:border-slate-500 hover:bg-slate-700/80'
+                                    ? 'border-teal-500 bg-teal-500/20 text-teal-400'
+                                    : 'border-navy-700 bg-navy-800 text-slate-300 hover:border-navy-600'
                                 }`}
                               >
-                                <span className="block text-xs text-slate-500 mb-0.5">{optIndex}</span>
                                 {option}
                               </button>
                             ))}
