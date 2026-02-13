@@ -31,15 +31,15 @@ const buttonVariants = cva(
         `,
         // Outline - Border only
         outline: `
-          border border-surface-border bg-transparent text-text
-          hover:border-aimana-teal hover:text-aimana-blue
-          active:bg-surface-hover
+          border border-white/15 bg-transparent text-slate-200
+          hover:border-aimana-teal hover:text-aimana-teal
+          active:bg-white/5
         `,
         // Ghost - No background
         ghost: `
-          bg-transparent text-text-secondary
-          hover:bg-surface-hover hover:text-text
-          active:bg-surface-light
+          bg-transparent text-slate-400
+          hover:bg-white/5 hover:text-white
+          active:bg-white/10
         `,
         // Destructive - Error/danger actions
         destructive: `
@@ -49,8 +49,8 @@ const buttonVariants = cva(
         `,
         // Link - Text only, looks like a link
         link: `
-          bg-transparent text-text-link underline-offset-4
-          hover:underline hover:text-text-link-hover
+          bg-transparent text-aimana-teal underline-offset-4
+          hover:underline hover:text-aimana-teal-light
         `,
       },
       size: {

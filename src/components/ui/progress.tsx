@@ -8,7 +8,7 @@ import * as React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../lib/utils';
 
-const progressVariants = cva('w-full overflow-hidden rounded-full bg-surface-light', {
+const progressVariants = cva('w-full overflow-hidden rounded-full bg-white/10', {
   variants: {
     size: {
       sm: 'h-1',
@@ -77,9 +77,9 @@ const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
       <div className="w-full">
         {(showLabel || label) && (
           <div className="mb-1.5 flex items-center justify-between text-sm">
-            {label && <span className="text-text-secondary">{label}</span>}
+            {label && <span className="text-slate-400">{label}</span>}
             {showLabel && (
-              <span className="font-medium text-text">
+              <span className="font-medium text-white">
                 {Math.round(percentage)}%
               </span>
             )}
@@ -129,7 +129,7 @@ const JourneyProgress = React.forwardRef<HTMLDivElement, JourneyProgressProps>(
           <span
             className={cn(
               'font-medium',
-              currentPhase >= 1 ? 'text-aimana-navy' : 'text-text-muted'
+              currentPhase >= 1 ? 'text-aimana-navy' : 'text-slate-500'
             )}
           >
             Planejar
@@ -137,7 +137,7 @@ const JourneyProgress = React.forwardRef<HTMLDivElement, JourneyProgressProps>(
           <span
             className={cn(
               'font-medium',
-              currentPhase >= 2 ? 'text-aimana-blue' : 'text-text-muted'
+              currentPhase >= 2 ? 'text-aimana-blue' : 'text-slate-500'
             )}
           >
             Executar
@@ -145,7 +145,7 @@ const JourneyProgress = React.forwardRef<HTMLDivElement, JourneyProgressProps>(
           <span
             className={cn(
               'font-medium',
-              currentPhase >= 3 ? 'text-aimana-teal' : 'text-text-muted'
+              currentPhase >= 3 ? 'text-aimana-teal' : 'text-slate-500'
             )}
           >
             Gerir
